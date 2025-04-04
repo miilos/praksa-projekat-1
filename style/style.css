@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+:root {
+    --color-primary: #054dba;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 62.5%;
+}
+
+body {
+    font-family: "Lato", sans-serif;
+    font-size: 1.5rem;
+}
+
+.signup {
+    width: 50%;
+    margin: 10rem auto;
+    padding: 5rem;
+    border: 1px solid var(--color-primary);
+    border-radius: .5rem;
+}
+
+.input {
+    display: block;
+    width: 100%;
+    margin: 2.5rem 0;
+    padding: .5rem;
+    border: 1px solid var(--color-primary);
+}
+
+.input:focus {
+    outline: none;
+}
+
+.signup-btn {
+    background-color: var(--color-primary);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 3rem;
+    cursor: pointer;
+}

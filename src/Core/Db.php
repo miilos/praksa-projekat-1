@@ -19,7 +19,7 @@ class Db
         $this->connect();
     }
 
-    private function connect()
+    private function connect(): void
     {
         try {
             $this->dbh = new PDO("mysql:host=$this->host;dbname=$this->database", $this->user, $this->pass);

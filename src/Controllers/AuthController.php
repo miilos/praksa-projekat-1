@@ -3,20 +3,16 @@
 namespace App\Controllers;
 
 use App\Core\Db;
-use App\Core\Request;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
-    public function signup()
+    public function signup($data): void
     {
-        $request = new Request();
-        $data = $request->getBody();
-
         $this->createUser($data);
     }
 
-    private function createUser($data)
+    private function createUser($data): void
     {
         $dbh = (new Db())->getHandler();
         $uuid = Uuid::uuid4();

@@ -1,11 +1,35 @@
 <?php
 
 use App\Controllers\AuthController;
+use App\Core\Request;
+use App\Models\UserModel;
+use App\Pages\FormRenderer;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+$errors = [];
+$formRenderer = new FormRenderer();
+
 if($_SERVER["REQUEST_METHOD"] === "POST") {
-    $authController = new AuthController();
-    $authController->signup();
+    $request = new Request();
+    $data = $request->getBody();
+
+    $userModel = new UserModel(
+        $data['firstName'],
+        $data['lastName'],
+        $data['password'],
+        $data['passwordConfirm'],
+        $data['email'],
+        $data['field']
+    );
+
+    if($userModel->validate()) {
+        $authController = new AuthController();
+        $authController->signup($data);
+    }
+    else {
+        $errors = $userModel->getErrors();
+    }
 }
 
 ?>
@@ -24,19 +48,22 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="signup" autocomplete="off">
         <h1 class="signup-title">Sign up</h1>
 
-        <input type="text" id="firstName" name="firstName" placeholder="Ime" class="input">
-        <input type="text" id="lastName" name="lastName" placeholder="Prezime" class="input">
-        <input type="text" id="email" name="email" placeholder="Email adresa" class="input">
-        <input type="password" id="password" name="password" placeholder="Password" class="input">
-        <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" class="input">
-        <select name="field" class="input">
-            <option value="-">Izaberite polje rada...</option>
-            <option value="it">IT</option>
-            <option value="prodaja">Prodaja</option>
-            <option value="pravo">Pravo</option>
-            <option value="menadzment">Menadzment</option>
-        </select>
-
+        <?php
+            echo $formRenderer->renderFormField('<input type="text" id="firstName" name="firstName" placeholder="Ime" class="input">', $errors['firstName'] ?? null);
+            echo $formRenderer->renderFormField('<input type="text" id="lastName" name="lastName" placeholder="Prezime" class="input">', $errors['lastName'] ?? null);
+            echo $formRenderer->renderFormField('<input type="text" id="email" name="email" placeholder="Email adresa" class="input">', $errors['email'] ?? null);
+            echo $formRenderer->renderFormField('<input type="password" id="password" name="password" placeholder="Password" class="input">', $errors['password'] ?? null);
+            echo $formRenderer->renderFormField('<input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" class="input">', $errors['passwordConfirm'] ?? null);
+            echo $formRenderer->renderFormField(
+                    '<select name="field" class="input">
+                            <option value="-">Izaberite polje rada...</option>
+                            <option value="it">IT</option>
+                            <option value="prodaja">Prodaja</option>
+                            <option value="pravo">Pravo</option>
+                            <option value="menadzment">Menadzment</option>
+                        </select>'
+            , $errors['field'] ?? null);
+        ?>
         <input type="submit" value="Sign up" class="signup-btn">
     </form>
 </body>

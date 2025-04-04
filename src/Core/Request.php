@@ -4,12 +4,12 @@ namespace App\Core;
 
 class Request
 {
-    private function getMethod()
+    private function getMethod(): string
     {
         return $_SERVER['REQUEST_METHOD'];
     }
 
-    public function getBody()
+    public function getBody(): array
     {
         $body = [];
 

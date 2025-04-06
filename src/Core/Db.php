@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Controllers\ErrorController;
 use PDO;
 use PDOException;
 
@@ -26,8 +27,8 @@ class Db
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch(PDOException $e) {
-            echo $e->getMessage();
-            exit();
+            $msg = ErrorController::getErrors()['db-error'];
+            ErrorController::redirectToErrorPage($msg);
         }
     }
 

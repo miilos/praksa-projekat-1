@@ -11,7 +11,18 @@
 <body>
     <div class="error-container">
         <h1 class="error-title">Error!</h1>
-        <p>Error msg</p>
+        <p>
+            <?php
+                require_once __DIR__ . '/../../vendor/autoload.php';
+
+                if(isset($_GET['err'])) {
+                    echo \App\Controllers\ErrorController::getErrors()[$_GET['err']];
+                }
+                else {
+                    echo 'Nepoznata greska!';
+                }
+            ?>
+        </p>
     </div>
 </body>
 </html>

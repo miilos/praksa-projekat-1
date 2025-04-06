@@ -9,10 +9,14 @@ class AuthController
 {
     public function signup($data): void
     {
-        $this->createUser($data);
+        $user = $this->createUser($data);
+
+        $session = new SessionController();
+        $session->startSession('user', $user);
+        header('Location: ../Pages/home.php');
     }
 
-    private function createUser($data): void
+    private function createUser($data): array
     {
         $dbh = (new Db())->getHandler();
         $uuid = Uuid::uuid4();
@@ -31,35 +35,56 @@ class AuthController
 
             $stmt->execute();
 
-            echo "signed up!";
+            // builds an array that looks like what fetching the new user from the database would look like,
+            // so that there's no need for another query to add user data to the session variable
+            unset($data['passwordConfirm']);
+            return ['userId' => $uuid, ...$data];
         }
         catch (\PDOException $e) {
-            echo $e->getMessage();
-            exit();
+//            if(str_contains($e->getMessage(), 'Duplicate entry')) {
+//                ErrorController::redirectToErrorPage('email-taken');
+//            }
+//            else {
+                $msg = ErrorController::getErrors()['db-error'];
+                ErrorController::redirectToErrorPage($msg);
+//            }
         }
+
+        return [];
     }
 
-    public function logIn($data): void
+    public function logIn($data): bool
     {
-        $dbh = (new Db())->getHandler();
+        try {
+            $dbh = (new Db())->getHandler();
 
-        $query = "SELECT * FROM users WHERE email=:email";
-        $stmt = $dbh->prepare($query);
-        $stmt->bindParam(':email', $data['email']);
+            $query = "SELECT * FROM users WHERE email=:email";
+            $stmt = $dbh->prepare($query);
+            $stmt->bindParam(':email', $data['email']);
 
-        $stmt->execute();
+            $stmt->execute();
 
-        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $user = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        if(
-            !$user ||
-            !$this->checkPassword($data['password'], $user['password'])
-        ) {
-            echo 'incorrect email or password!';
+            if (
+                !$user ||
+                !$this->checkPassword($data['password'], $user['password'])
+            ) {
+                return false;
+            }
+
+            $session = new SessionController();
+            $session->startSession('user', $user);
+            header("Location: ../Pages/home.php");
+
+            return true;
         }
-        else {
-            echo 'logged in!';
+        catch (\PDOException $e) {
+            $msg = ErrorController::getErrors()['db-error'];
+            ErrorController::redirectToErrorPage($msg);
         }
+
+        return false;
     }
 
     private function checkPassword($password, $hash): bool

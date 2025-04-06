@@ -38,4 +38,32 @@ class AuthController
             exit();
         }
     }
+
+    public function logIn($data): void
+    {
+        $dbh = (new Db())->getHandler();
+
+        $query = "SELECT * FROM users WHERE email=:email";
+        $stmt = $dbh->prepare($query);
+        $stmt->bindParam(':email', $data['email']);
+
+        $stmt->execute();
+
+        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if(
+            !$user ||
+            !$this->checkPassword($data['password'], $user['password'])
+        ) {
+            echo 'incorrect email or password!';
+        }
+        else {
+            echo 'logged in!';
+        }
+    }
+
+    private function checkPassword($password, $hash): bool
+    {
+        return password_verify($password, $hash);
+    }
 }

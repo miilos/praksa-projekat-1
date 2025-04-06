@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 $errors = [];
 $formRenderer = new FormRenderer();
 
+// if the signup form was submitted, get the request body, validate it and create new user
 if($_SERVER["REQUEST_METHOD"] === "POST") {
     $request = new Request();
     $data = $request->getBody();
@@ -45,8 +46,8 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>Sign up</title>
 </head>
 <body>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="signup" autocomplete="off">
-        <h1 class="signup-title">Sign up</h1>
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="form" autocomplete="off">
+        <h1 class="form-title">Sign up</h1>
 
         <?php
             echo $formRenderer->renderFormField('<input type="text" id="firstName" name="firstName" placeholder="Ime" class="input">', $errors['firstName'] ?? null);
@@ -64,7 +65,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
                         </select>'
             , $errors['field'] ?? null);
         ?>
-        <input type="submit" value="Sign up" class="signup-btn">
+        <input type="submit" value="Sign up" class="form-btn">
     </form>
 </body>
 </html>

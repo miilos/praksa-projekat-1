@@ -4,6 +4,8 @@ namespace App\Pages;
 
 class FormRenderer
 {
+    // if there are no validation errors, render the container and the passed form field html
+    // if there are errors, add the input--error class to the passed html and render the field along with the errors
     public function renderFormField($inputFieldHtml, $errors): string
     {
         if(empty($errors)) {

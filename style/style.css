@@ -20,7 +20,9 @@ body {
     font-size: 1.5rem;
 }
 
-.signup {
+/* form styles */
+
+.form {
     width: 50%;
     margin: 10rem auto;
     padding: 5rem;
@@ -54,11 +56,25 @@ body {
     outline: none;
 }
 
-.signup-btn {
+.form-btn {
     background-color: var(--color-primary);
     color: #fff;
     padding: 1rem 1.5rem;
     border: none;
     border-radius: 3rem;
     cursor: pointer;
+}
+
+/* error page styles */
+
+.error-container {
+    width: 50%;
+    margin: 10rem auto;
+    border: 1px solid var(--color-error);
+    border-radius: 5px;
+    padding: 5rem;
+}
+
+.error-title {
+    margin-bottom: 2rem;
 }

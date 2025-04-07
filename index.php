@@ -22,7 +22,7 @@ require_once __DIR__ . '/vendor/autoload.php';
         include_once './src/Pages/_navbar.php';
 
         $jobController = new JobController();
-        $jobController->getAllJobs('Svi poslovi');
+        $jobController->getJobs('Svi poslovi');
     ?>
 </body>
 </html>

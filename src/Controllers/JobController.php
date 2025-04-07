@@ -7,10 +7,17 @@ use App\Pages\JobRenderer;
 
 class JobController
 {
-    public function getAllJobs($title): void
+    public function getJobs($title, $filter = []): void
     {
         $jobModel = new JobModel();
-        $jobs = $jobModel->getAllJobs();
+        $jobs = [];
+
+        if ($filter) {
+           $jobs = $jobModel->getJobs($filter);
+        }
+        else {
+            $jobs = $jobModel->getJobs();
+        }
 
         $jobRenderer = new JobRenderer();
         $html = $jobRenderer->renderJobs($title, $jobs);

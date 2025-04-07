@@ -12,7 +12,9 @@ class SessionController
 
     public function getSessionData($key): mixed
     {
-        session_start();
+        if (!(session_status() === PHP_SESSION_ACTIVE)) {
+            session_start();
+        }
         return $_SESSION[$key];
     }
 }

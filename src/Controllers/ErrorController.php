@@ -8,7 +8,7 @@ class ErrorController
 {
     public static function redirectToErrorPage($err): void
     {
-        header('Location: ../Pages/error.php?err=' . $err);
+        header('Location: src/Pages/error.php?err=' . $err);
         exit();
     }
 

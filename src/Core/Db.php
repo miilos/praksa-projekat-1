@@ -27,8 +27,7 @@ class Db
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $e) {
-            $msg = ErrorController::getErrors()['db-error'];
-            ErrorController::redirectToErrorPage($msg);
+            ErrorController::redirectToErrorPage('db-error');
         }
     }
 

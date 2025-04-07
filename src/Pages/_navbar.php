@@ -9,6 +9,12 @@ $user = $session->getSessionData('user');
 ?>
 
 <nav class="nav-container">
+    <ul class="nav-list nav-list__menu">
+        <li class="nav-item">
+            <a href="../../index.php" class="nav-item-link">Svi oglasi</a>
+        </li>
+    </ul>
+
     <ul class="nav-list nav-list__users">
         <?php
             if($user) {

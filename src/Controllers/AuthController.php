@@ -45,8 +45,7 @@ class AuthController
 //                ErrorController::redirectToErrorPage('email-taken');
 //            }
 //            else {
-                $msg = ErrorController::getErrors()['db-error'];
-                ErrorController::redirectToErrorPage($msg);
+            ErrorController::redirectToErrorPage('db-error');
 //            }
         }
 
@@ -80,8 +79,7 @@ class AuthController
             return true;
         }
         catch (\PDOException $e) {
-            $msg = ErrorController::getErrors()['db-error'];
-            ErrorController::redirectToErrorPage($msg);
+            ErrorController::redirectToErrorPage('db-error');
         }
 
         return false;

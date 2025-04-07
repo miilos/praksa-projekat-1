@@ -11,7 +11,7 @@ $errors = [];
 $formRenderer = new FormRenderer();
 
 // if the signup form was submitted, get the request body, validate it and create new user
-if($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $request = new Request();
     $data = $request->getBody();
 
@@ -24,7 +24,7 @@ if($_SERVER["REQUEST_METHOD"] === "POST") {
         $data['field']
     );
 
-    if($userModel->validate()) {
+    if ($userModel->validate()) {
         $authController = new AuthController();
         $authController->signup($data);
     }

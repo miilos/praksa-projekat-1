@@ -8,7 +8,7 @@ class FormRenderer
     // if there are errors, add the input--error class to the passed html and render the field along with the errors
     public function renderFormField($inputFieldHtml, $errors): string
     {
-        if(empty($errors)) {
+        if (empty($errors)) {
             return '<div class="input-container">' . $inputFieldHtml . '</div>';
         }
         else {

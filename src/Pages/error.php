@@ -15,7 +15,7 @@
             <?php
                 require_once __DIR__ . '/../../vendor/autoload.php';
 
-                if(isset($_GET['err'])) {
+                if (isset($_GET['err'])) {
                     echo \App\Controllers\ErrorController::getErrors()[$_GET['err']];
                 }
                 else {

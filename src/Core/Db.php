@@ -26,7 +26,7 @@ class Db
             $this->dbh = new PDO("mysql:host=$this->host;dbname=$this->database", $this->user, $this->pass);
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
-        catch(PDOException $e) {
+        catch (PDOException $e) {
             $msg = ErrorController::getErrors()['db-error'];
             ErrorController::redirectToErrorPage($msg);
         }

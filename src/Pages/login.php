@@ -8,14 +8,14 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
     $formRenderer = new FormRenderer();
 
-    if($_SERVER["REQUEST_METHOD"] === "POST") {
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $request = new Request();
         $data = $request->getBody();
         $errors = [];
 
         $authController = new AuthController();
 
-        if(!$authController->logIn($data)) {
+        if (!$authController->logIn($data)) {
             $errors['email'][] = 'Incorrect email or password!';
             $errors['password'][] = 'Incorrect email or password!';
         }

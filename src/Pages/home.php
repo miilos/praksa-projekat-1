@@ -7,6 +7,10 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 $user = SessionManager::getSessionData('user');
 
+if (!$user) {
+    header('Location: ./login.php');
+}
+
 ?>
 
 <!doctype html>

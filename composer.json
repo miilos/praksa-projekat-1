@@ -1,0 +1,17 @@
+{
+    "name": "milos/praksa-projekat-1",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "miilos",
+            "email": "milos.pop.004@gmail.com"
+        }
+    ],
+    "require": {
+        "ramsey/uuid": "^4.7"
+    }
+}

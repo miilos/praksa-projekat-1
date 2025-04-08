@@ -16,7 +16,7 @@
                 require_once __DIR__ . '/../../vendor/autoload.php';
 
                 if (isset($_GET['err'])) {
-                    echo \App\Controllers\ErrorController::getErrors()[$_GET['err']];
+                    echo \App\Managers\ErrorManager::getErrors()[$_GET['err']];
                 }
                 else {
                     echo 'Nepoznata greska!';

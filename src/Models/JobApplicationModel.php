@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Controllers\ErrorController;
 use App\Core\Db;
+use App\Managers\ErrorManager;
 use Ramsey\Uuid\Uuid;
 
 class JobApplicationModel
 {
-    public function createJobApplication($data): bool
+    public function createJobApplication(array $data): bool
     {
         try {
-            $dbh = (new Db())->getHandler();
+            $dbh = (new Db())->getConnection();
 
             $query = "INSERT INTO applications(applicationId, userId, jobId) VALUES(:applicationId, :userId, :jobId)";
 
@@ -27,7 +27,10 @@ class JobApplicationModel
             return $stmt->rowCount() === 1;
         }
         catch (\PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
         return true;

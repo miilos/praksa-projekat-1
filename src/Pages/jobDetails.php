@@ -1,7 +1,7 @@
 <?php
 
+use App\Managers\ErrorManager;
 use App\Models\JobModel;
-use App\Controllers\ErrorController;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
@@ -9,7 +9,7 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     $job = $jobModel->getJobById($_GET['id']);
 
     if (!$job) {
-        ErrorController::redirectToErrorPage('bad-job-id');
+        ErrorManager::redirectToErrorPage('bad-job-id');
     }
 ?>
 

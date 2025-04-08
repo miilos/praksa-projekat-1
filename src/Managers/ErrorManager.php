@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Managers;
 
 // each part of the app will grab the error message from the getErrors() method
 // and then call the redirectToErrorPage() method with the given message
-class ErrorController
+class ErrorManager
 {
-    public static function redirectToErrorPage($err): void
+    public static function redirectToErrorPage(string $err): void
     {
         header('Location: /praksa-projekat-1/src/Pages/error.php?err=' . $err);
         exit();
@@ -17,7 +17,8 @@ class ErrorController
         return [
           'email-taken' => 'Ova email adresa je zauzeta!',
             'db-error' => 'Greska pri povezivanju sa bazom!',
-            'bad-job-id' => 'Oglas koji trazite ne postoji!'
+            'bad-job-id' => 'Oglas koji trazite ne postoji!',
+            'unknown-error' => 'Nesto ne radi!'
         ];
     }
 }

@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Controllers\ErrorController;
 use App\Core\Db;
+use App\Managers\ErrorManager;
 
 class JobModel
 {
     // meant for getting all jobs or filtering jobs based on the field
     // for additional filtering, filterJobs() is used
-    public function getJobs($filter = []): array
+    public function getJobs(array $filter = []): array
     {
         try {
-            $dbh = (new Db())->getHandler();
+            $dbh = (new Db())->getConnection();
 
             $query = "SELECT * FROM jobs j INNER JOIN employers e ON j.employerId = e.employerId";
 
@@ -38,16 +38,19 @@ class JobModel
             return $jobs;
         }
         catch (\PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
         return [];
     }
 
-    public function filterJobs($filters): array
+    public function filterJobs(array $filters): array
     {
         try {
-            $dbh = (new Db())->getHandler();
+            $dbh = (new Db())->getConnection();
 
             $query = "SELECT * FROM jobs j INNER JOIN employers e ON j.employerId = e.employerId";
 
@@ -99,21 +102,24 @@ class JobModel
             return $jobs;
         }
         catch (\PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
         return [];
     }
 
-    private function checkFiltersEmpty($filters): bool
+    private function checkFiltersEmpty(array $filters): bool
     {
         return count(array_filter($filters)) > 0;
     }
 
-    public function getJobById($id): array | bool
+    public function getJobById(string $id): array | bool
     {
         try {
-            $dbh = (new Db())->getHandler();
+            $dbh = (new Db())->getConnection();
 
             $query = "SELECT * FROM jobs j INNER JOIN employers e ON j.employerId = e.employerId WHERE jobId=:jobId";
 
@@ -126,7 +132,12 @@ class JobModel
             return $job;
         }
         catch (\PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
         }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+        }
+
+        return [];
     }
 }

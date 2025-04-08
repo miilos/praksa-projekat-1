@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-use App\Controllers\ErrorController;
+use App\Managers\ErrorManager;
 use PDO;
 use PDOException;
 
@@ -27,11 +27,14 @@ class Db
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
     }
 
-    public function getHandler()
+    public function getConnection()
     {
         return $this->dbh;
     }

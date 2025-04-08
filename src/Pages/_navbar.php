@@ -1,10 +1,9 @@
 <?php
 
 // no using autoload because this file is meant to be included in other files that already required autoload
-use App\Controllers\SessionController;
+use App\Managers\SessionManager;
 
-$session = new SessionController();
-$user = $session->getSessionData('user');
+$user = SessionManager::getSessionData('user');
 
 ?>
 

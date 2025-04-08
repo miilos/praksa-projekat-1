@@ -4,7 +4,7 @@ namespace App\Pages;
 
 class JobRenderer
 {
-    public function renderJobs($title, $jobs): string
+    public function renderJobs(string $title, array $jobs): string
     {
         $html = '
             <div class="jobs-container">
@@ -26,7 +26,7 @@ class JobRenderer
         return $html;
     }
 
-    private function renderJob($job): string
+    private function renderJob(array $job): string
     {
         $html = '
             <div class="job">
@@ -99,7 +99,7 @@ class JobRenderer
         return $html;
     }
 
-    private function formatStartingSalary($salary): string
+    private function formatStartingSalary(string $salary): string
     {
         return substr_replace($salary, '.', -3, 0);
     }

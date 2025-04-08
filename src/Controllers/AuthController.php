@@ -3,22 +3,22 @@
 namespace App\Controllers;
 
 use App\Core\Db;
+use App\Managers\ErrorManager;
+use App\Managers\SessionManager;
 use Ramsey\Uuid\Uuid;
 
 class AuthController
 {
-    public function signup($data): void
+    public function signup(array $data): void
     {
         $user = $this->createUser($data);
-
-        $session = new SessionController();
-        $session->startSession('user', $user);
+        SessionManager::startSession('user', $user);
         header('Location: ../Pages/home.php');
     }
 
-    private function createUser($data): array
+    private function createUser(array $data): array
     {
-        $dbh = (new Db())->getHandler();
+        $dbh = (new Db())->getConnection();
         $uuid = Uuid::uuid4();
         $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
 
@@ -41,16 +41,19 @@ class AuthController
             return ['userId' => $uuid, ...$data];
         }
         catch (\PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
         return [];
     }
 
-    public function logIn($data): bool
+    public function logIn(array $data): bool
     {
         try {
-            $dbh = (new Db())->getHandler();
+            $dbh = (new Db())->getConnection();
 
             $query = "SELECT * FROM users WHERE email=:email";
             $stmt = $dbh->prepare($query);
@@ -67,20 +70,22 @@ class AuthController
                 return false;
             }
 
-            $session = new SessionController();
-            $session->startSession('user', $user);
+            SessionManager::startSession('user', $user);
             header("Location: ../Pages/home.php");
 
             return true;
         }
         catch (\PDOException $e) {
-            ErrorController::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
         return false;
     }
 
-    private function checkPassword($password, $hash): bool
+    private function checkPassword(string $password, string $hash): bool
     {
         return password_verify($password, $hash);
     }

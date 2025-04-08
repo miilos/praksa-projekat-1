@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Models;
-use App\Controllers\ErrorController;
 use App\Core\Db;
+use App\Managers\ErrorManager;
 
 class UserModel
 {
@@ -67,7 +67,7 @@ class UserModel
     private function getEmailsInDB(): array
     {
         try {
-            $dbh = (new Db())->getHandler();
+            $dbh = (new Db())->getConnection();
 
             $stmt = $dbh->prepare('SELECT email FROM users');
             $stmt->execute();
@@ -76,8 +76,11 @@ class UserModel
             return $emails;
         }
         catch (\PDOException $e) {
-            $msg = ErrorController::getErrors()['db-error'];
-            ErrorController::redirectToErrorPage($msg);
+            $msg = ErrorManager::getErrors()['db-error'];
+            ErrorManager::redirectToErrorPage($msg);
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
         return [];

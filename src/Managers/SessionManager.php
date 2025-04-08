@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Managers;
 
-class SessionController
+class SessionManager
 {
-    public function startSession($key, $value): void
+    public static function startSession(string $key, mixed $value): void
     {
         session_start();
         $_SESSION[$key] = $value;
     }
 
-    public function getSessionData($key): mixed
+    public static function getSessionData(string $key): mixed
     {
         if (!(session_status() === PHP_SESSION_ACTIVE)) {
             session_start();

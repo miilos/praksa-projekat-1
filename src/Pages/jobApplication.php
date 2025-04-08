@@ -1,11 +1,10 @@
 <?php
 
-use App\Controllers\SessionController;
+use App\Managers\SessionManager;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
-$sessionController = new SessionController();
-$user = $sessionController->getSessionData('user');
+$user = SessionManager::getSessionData('user');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

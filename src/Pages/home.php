@@ -1,12 +1,11 @@
 <?php
 
 use App\Controllers\JobController;
-use App\Controllers\SessionController;
+use App\Managers\SessionManager;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-$session = new SessionController();
-$user = $session->getSessionData('user');
+$user = SessionManager::getSessionData('user');
 
 ?>
 

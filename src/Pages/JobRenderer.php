@@ -2,8 +2,6 @@
 
 namespace App\Pages;
 
-use App\Models\JobModel;
-
 class JobRenderer
 {
     public function renderJobs($title, $jobs): string
@@ -13,9 +11,15 @@ class JobRenderer
                 <h1 class="jobs-title">' . $title . '</h1>
         ';
 
-        foreach ($jobs as $job) {
-            $html .= self::renderJob($job);
+        if ($jobs) {
+            foreach ($jobs as $job) {
+                $html .= $this->renderJob($job);
+            }
         }
+        else {
+            $html .= '<h3>Nema oglasa koji odgovaraju tim filterima :(</h3>';
+        }
+
 
         $html .= '</div>';
 
@@ -59,7 +63,7 @@ class JobRenderer
                 </div>
     
                 <div class="job-apply-btn">
-                    <a href="./job.php?id=' . $job['jobId'] . '" class="btn btn--primary">Vidi jos</a>
+                    <a href="/praksa-projekat-1/src/Pages/jobDetails.php?id=' . $job['jobId'] . '" class="btn btn--primary">Vidi jos</a>
                 </div>
             </div>
         ';

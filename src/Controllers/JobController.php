@@ -24,4 +24,15 @@ class JobController
 
         echo $html;
     }
+
+    public function getFilteredJobs($title, $filter): void
+    {
+        $jobModel = new JobModel();
+        $jobs = $jobModel->filterJobs($filter);
+
+        $jobRenderer = new JobRenderer();
+        $html = $jobRenderer->renderJobs($title, $jobs);
+
+        echo $html;
+    }
 }

@@ -15,6 +15,6 @@ class SessionController
         if (!(session_status() === PHP_SESSION_ACTIVE)) {
             session_start();
         }
-        return $_SESSION[$key];
+        return $_SESSION[$key] ?? null;
     }
 }

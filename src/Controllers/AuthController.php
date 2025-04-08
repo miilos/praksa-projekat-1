@@ -41,12 +41,7 @@ class AuthController
             return ['userId' => $uuid, ...$data];
         }
         catch (\PDOException $e) {
-//            if(str_contains($e->getMessage(), 'Duplicate entry')) {
-//                ErrorController::redirectToErrorPage('email-taken');
-//            }
-//            else {
             ErrorController::redirectToErrorPage('db-error');
-//            }
         }
 
         return [];

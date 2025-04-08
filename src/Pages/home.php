@@ -7,6 +7,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 $session = new SessionController();
 $user = $session->getSessionData('user');
+
 ?>
 
 <!doctype html>
@@ -17,6 +18,7 @@ $user = $session->getSessionData('user');
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../../style/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <title>Home</title>
 </head>
 <body>

@@ -11,7 +11,7 @@ $user = $session->getSessionData('user');
 <nav class="nav-container">
     <ul class="nav-list nav-list__menu">
         <li class="nav-item">
-            <a href="../../index.php" class="nav-item-link">Svi oglasi</a>
+            <a href="/praksa-projekat-1/index.php" class="nav-item-link">Svi oglasi</a>
         </li>
     </ul>
 
@@ -20,17 +20,17 @@ $user = $session->getSessionData('user');
             if($user) {
                 echo '
                     <li class="nav-item">
-                        <a href="./src/Pages/home.php" class="nav-item-link">' . $user['firstName'] . '</a>
+                        <a href="/praksa-projekat-1/src/Pages/home.php" class="nav-item-link">' . $user['firstName'] . '</a>
                     </li>
                 ';
             }
             else {
                 echo '
                     <li class="nav-item">
-                        <a href="./src/Pages/login.php" class="nav-item-link nav-item-link--login">Log in</a>
+                        <a href="/praksa-projekat-1/src/Pages/login.php" class="nav-item-link nav-item-link--login">Log in</a>
                     </li>
                     <li class="nav-item">
-                        <a href="./src/Pages/signup.php" class="nav-item-link nav-item-link--signup">Sign up</a>
+                        <a href="/praksa-projekat-1/src/Pages/signup.php" class="nav-item-link nav-item-link--signup">Sign up</a>
                     </li>
                 ';
             }

@@ -8,7 +8,7 @@ class ErrorController
 {
     public static function redirectToErrorPage($err): void
     {
-        header('Location: src/Pages/error.php?err=' . $err);
+        header('Location: /praksa-projekat-1/src/Pages/error.php?err=' . $err);
         exit();
     }
 
@@ -16,7 +16,8 @@ class ErrorController
     {
         return [
           'email-taken' => 'Ova email adresa je zauzeta!',
-            'db-error' => 'Greska pri povezivanju sa bazom!'
+            'db-error' => 'Greska pri povezivanju sa bazom!',
+            'bad-job-id' => 'Oglas koji trazite ne postoji!'
         ];
     }
 }

@@ -87,7 +87,7 @@ body {
 }
 
 .input--error {
-    border: 1px solid var(--color-error);
+    border: 2px solid var(--color-error);
 }
 
 .error-msg {
@@ -252,8 +252,89 @@ label[for="flexibleHours"] {
     color: #fff;
 }
 
+.btn--secondary {
+    background-color: #fff;
+    color: var(--color-primary);
+}
+
 /* user styles */
 
 .user-hello-msg {
     padding: 2rem;
+}
+
+/* job page styles */
+
+.job-header {
+    padding: 2rem;
+    border-bottom: 2px solid var(--color-primary);
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.job-header-title{
+    font-size: 4rem;
+}
+
+.job-header-employer {
+    font-size: 2.5rem;
+}
+
+.job-header-info {
+    margin-top: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+}
+
+.job-header-info div {
+    font-size: 1.7rem;
+
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.job-header-info div span {
+    font-size: 2rem;
+}
+
+.job-header-extra-info {
+    margin-top: 2rem;
+
+    display: flex;
+    gap: .5rem;
+}
+
+.job-info {
+    padding: 2rem;
+}
+
+.job-info > div {
+    margin-top: 2rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* job application styles */
+
+.job-application {
+    background-color: var(--color-primary);
+    border-radius: 2.5rem;
+    width: 80%;
+    height: 20rem;
+    margin: 2rem auto;
+    padding: 2rem;
+    color: #fff;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 }

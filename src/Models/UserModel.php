@@ -3,6 +3,7 @@
 namespace App\Models;
 use App\Core\Db;
 use App\Managers\ErrorManager;
+use Ramsey\Uuid\Uuid;
 
 class UserModel
 {
@@ -59,7 +60,7 @@ class UserModel
         return empty($this->errors);
     }
 
-    public function getErrors(): array
+    public function getValidationErrors(): array
     {
         return $this->errors;
     }
@@ -78,6 +79,70 @@ class UserModel
         catch (\PDOException $e) {
             $msg = ErrorManager::getErrors()['db-error'];
             ErrorManager::redirectToErrorPage($msg);
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+        }
+
+        return [];
+    }
+
+    public function createUser(): array
+    {
+        $dbh = (new Db())->getConnection();
+        $uuid = Uuid::uuid4();
+        $this->password = password_hash($this->password, PASSWORD_BCRYPT);
+
+        try {
+            $query = "INSERT INTO users(userId, firstname, lastname, email, password, field) VALUES (:id, :firstName, :lastName, :email, :password, :field)";
+
+            $stmt = $dbh->prepare($query);
+            $stmt->bindParam(':id', $uuid);
+            $stmt->bindParam(':firstName', $this->firstName);
+            $stmt->bindParam(':lastName', $this->lastName);
+            $stmt->bindParam(':email',$this->email);
+            $stmt->bindParam(':password', $this->password);
+            $stmt->bindParam(':field', $this->field);
+
+            $stmt->execute();
+
+            // builds an array that looks like what fetching the new user from the database would look like,
+            // so that there's no need for another query to add user data to the session variable
+            unset($this->passwordConfirm);
+            return [
+                'userId' => $uuid,
+                'firstName' => $this->firstName,
+                'lastName' => $this->lastName,
+                'email' => $this->email,
+                'password' => $this->password,
+                'field' => $this->field
+            ];
+        }
+        catch (\PDOException $e) {
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+        }
+
+        return [];
+    }
+
+    public static function getUserByEmail(string $email): array
+    {
+        try {
+            $dbh = (new Db())->getConnection();
+
+            $query = "SELECT * FROM users WHERE email=:email";
+            $stmt = $dbh->prepare($query);
+            $stmt->bindParam(':email', $email);
+
+            $stmt->execute();
+
+            return $stmt->fetch(\PDO::FETCH_ASSOC);
+        }
+        catch (\PDOException $e) {
+            ErrorManager::redirectToErrorPage('db-error');
         }
         catch (\Throwable $t) {
             ErrorManager::redirectToErrorPage('unknown-error');

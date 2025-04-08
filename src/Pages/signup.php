@@ -2,7 +2,6 @@
 
 use App\Controllers\AuthController;
 use App\Core\Request;
-use App\Models\UserModel;
 use App\Pages\FormRenderer;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -15,21 +14,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $request = new Request();
     $data = $request->getBody();
 
-    $userModel = new UserModel(
-        $data['firstName'],
-        $data['lastName'],
-        $data['password'],
-        $data['passwordConfirm'],
-        $data['email'],
-        $data['field']
-    );
+    $errors = [];
+    $authController = new AuthController();
 
-    if ($userModel->validate()) {
-        $authController = new AuthController();
-        $authController->signup($data);
-    }
-    else {
-        $errors = $userModel->getErrors();
+    $signupStatus = $authController->signUp($data);
+    if (is_array($signupStatus)) {
+        $errors = $signupStatus;
     }
 }
 

@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Core\Db;
 use App\Managers\ErrorManager;
 use App\Managers\SessionManager;
 use App\Models\UserModel;
@@ -33,29 +32,18 @@ class AuthController
 
     public function logIn(array $data): bool
     {
-        try {
-            $user = UserModel::getUserByEmail($data['email']);
+        $user = UserModel::getUserByEmail($data['email']);
 
-            if (
-                !$user ||
-                !$this->checkPassword($data['password'], $user['password'])
-            ) {
-                return false;
-            }
-
-            SessionManager::startSession('user', $user);
-            header("Location: ../Pages/home.php");
-
-            return true;
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
+        if (
+            !$user ||
+            !$this->checkPassword($data['password'], $user['password'])
+        ) {
+            return false;
         }
 
-        return false;
+        SessionManager::startSession('user', $user);
+        header("Location: ../Pages/home.php");
+        return true;
     }
 
     private function checkPassword(string $password, string $hash): bool

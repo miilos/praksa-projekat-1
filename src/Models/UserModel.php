@@ -128,7 +128,7 @@ class UserModel
         return [];
     }
 
-    public static function getUserByEmail(string $email): array
+    public static function getUserByEmail(string $email): array|bool
     {
         try {
             $dbh = (new Db())->getConnection();

@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\JobApplicationController;
 use App\Controllers\JobController;
 use App\Managers\SessionManager;
 
@@ -32,6 +33,8 @@ if (!$user) {
     <?php
         $jobController = new JobController();
         $jobController->getJobs("Oglasi za vas", [ 'field' => $user['field'] ]);
+
+        JobApplicationController::getApplicationsByUser($user['userId']);
     ?>
 </body>
 </html>

@@ -1,7 +1,9 @@
 <?php
 
 use App\Managers\ErrorManager;
+use App\Managers\SessionManager;
 use App\Models\JobModel;
+use App\Models\JobApplicationModel;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
@@ -88,8 +90,32 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     </div>
 
     <div class="job-application">
-        <h1 class="job-application-title">Prijavi se!</h1>
-        <a href="/praksa-projekat-1/src/Pages/jobApplication.php?jobId=<?php echo $job['jobId']?>" class="btn btn--secondary">Posalji prijavu</a>
+        <?php
+            $user = SessionManager::getSessionData('user');
+            $applied = false;
+
+            if ($user) {
+                $jobsAppliedTo = JobApplicationModel::getJobsAppliedToByUser($user['userId'], true);
+
+                foreach ($jobsAppliedTo as $jobApplied) {
+                    if ($jobApplied['jobId'] === $job['jobId']) {
+                        $applied = true;
+                    }
+                }
+            }
+
+            if ($applied) {
+                echo '
+                    <h1 class="job-application-title">Prijavili ste se na ovaj oglas ' . date('j.n.Y.', strtotime($jobApplied['submittedAt'])) . '</h1>
+                ';
+            }
+            else {
+                echo '
+                    <h1 class="job-application-title">Prijavi se!</h1>
+                    <a href="/praksa-projekat-1/src/Pages/jobApplication.php?jobId=' . $job['jobId'] . '" class="btn btn--secondary">Posalji prijavu</a>
+                ';
+            }
+        ?>
     </div>
 </body>
 </html>

@@ -133,6 +133,25 @@ label[for="flexibleHours"] {
     margin-bottom: 2rem;
 }
 
+/* success page styles */
+
+.success-container {
+    width: 50%;
+    margin: 10rem auto;
+    border: 1px solid #07a107;
+    border-radius: 5px;
+    padding: 5rem;
+}
+
+.success-container a {
+    display: inline-block;
+    margin-top: 2rem;
+}
+
+.success-title {
+    margin-bottom: 2rem;
+}
+
 /* error page styles */
 
 .error-container {

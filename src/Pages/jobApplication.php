@@ -1,13 +1,18 @@
 <?php
 
 use App\Managers\SessionManager;
+use App\Controllers\JobApplicationController;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
 $user = SessionManager::getSessionData('user');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+    $data = [
+            'userId' => $_POST['userId'],
+            'jobId' =>  $_POST['jobId']
+    ];
+    JobApplicationController::apply($data);
 }
 
 ?>

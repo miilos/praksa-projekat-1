@@ -15,10 +15,11 @@ class ErrorManager
     public static function getErrors(): array
     {
         return [
-          'email-taken' => 'Ova email adresa je zauzeta!',
-            'db-error' => 'Greska pri povezivanju sa bazom!',
-            'bad-job-id' => 'Oglas koji trazite ne postoji!',
-            'unknown-error' => 'Nesto ne radi!'
+          'email-taken' => 'Ova email adresa je zauzeta',
+            'db-error' => 'Greska pri povezivanju sa bazom',
+            'bad-job-id' => 'Oglas koji trazite ne postoji',
+            'failed-application' => 'Vasa prijava nije poslata. Probajte ponovo',
+            'unknown-error' => 'Nesto ne radi'
         ];
     }
 }

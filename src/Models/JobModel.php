@@ -4,12 +4,26 @@ namespace App\Models;
 
 use App\Core\Db;
 use App\Managers\ErrorManager;
+use App\Managers\SuccessManager;
+use Ramsey\Uuid\Uuid;
 
-class JobModel
+class JobModel extends Model
 {
+    public function __construct(
+        protected string $employerId,
+        protected string $jobName,
+        protected string $description,
+        protected string $field,
+        protected int $startSalary,
+        protected int $shifts,
+        protected string $location,
+        protected bool $flexibleHours,
+        protected bool $workFromHome
+    ) {}
+
     // meant for getting all jobs or filtering jobs based on the field
     // for additional filtering, filterJobs() is used
-    public function getJobs(array $filter = []): array
+    public static function getJobs(array $filter = []): array
     {
         try {
             $dbh = (new Db())->getConnection();
@@ -47,7 +61,7 @@ class JobModel
         return [];
     }
 
-    public function filterJobs(array $filters): array
+    public static function filterJobs(array $filters): array
     {
         try {
             $dbh = (new Db())->getConnection();
@@ -58,7 +72,7 @@ class JobModel
             // of the filters that are set
             // if not, skip the query building and execute it as is
 
-            $filtersNotEmpty = $this->checkFiltersEmpty($filters);
+            $filtersNotEmpty = self::checkFiltersEmpty($filters);
             if ($filtersNotEmpty) {
                 $query .= " WHERE";
 
@@ -111,12 +125,12 @@ class JobModel
         return [];
     }
 
-    private function checkFiltersEmpty(array $filters): bool
+    private static function checkFiltersEmpty(array $filters): bool
     {
         return count(array_filter($filters)) > 0;
     }
 
-    public function getJobById(string $id): array | bool
+    public static function getJobById(string $id): array | bool
     {
         try {
             $dbh = (new Db())->getConnection();
@@ -139,5 +153,67 @@ class JobModel
         }
 
         return [];
+    }
+
+    public function validate(): bool
+    {
+        if ($this->employerId === '-') {
+            $this->errors['employerId'][] = 'Morate izabrati poslodavca';
+        }
+
+        if (!$this->jobName) {
+            $this->errors['jobName'][] = 'Morate uneti naziv oglasa';
+        }
+
+        if (!$this->description) {
+            $this->errors['description'][] = 'Morate unesti opis oglasa';
+        }
+
+        if (!$this->field) {
+            $this->errors['field'][] = 'Morate izabrati polje rada';
+        }
+
+        if (!$this->startSalary) {
+            $this->errors['startSalary'][] = 'Morate uneti pocetnu platu';
+        }
+
+        if (!$this->location) {
+            $this->errors['location'][] = 'Morate uneti lokaciju posla';
+        }
+
+        return empty($this->errors);
+    }
+
+    public function createJob(): void
+    {
+        try {
+            $dbh = (new Db())->getConnection();
+
+            $jobId = Uuid::uuid4();
+            $query = "INSERT INTO jobs
+                        (jobId, employerId, jobName, description, field, startSalary, shifts, location, flexibleHours, workFromHome)
+                        VALUES
+                        (:jobId, :employerId, :jobName, :description, :field, :startSalary, :shifts, :location, :flexibleHours, :workFromHome)";
+
+            $stmt = $dbh->prepare($query);
+            $stmt->bindParam(':jobId', $jobId);
+            $stmt->bindParam(':employerId', $this->employerId);
+            $stmt->bindParam(':jobName', $this->jobName);
+            $stmt->bindParam(':description', $this->description);
+            $stmt->bindParam(':field', $this->field);
+            $stmt->bindParam(':startSalary', $this->startSalary);
+            $stmt->bindParam(':shifts', $this->shifts);
+            $stmt->bindParam(':location', $this->location);
+            $stmt->bindParam(':flexibleHours', $this->flexibleHours);
+            $stmt->bindParam(':workFromHome', $this->workFromHome);
+
+            $stmt->execute();
+        }
+        catch (\PDOException $e) {
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+        }
     }
 }

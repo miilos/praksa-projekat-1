@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Managers\ErrorManager;
+use App\Managers\SuccessManager;
 use App\Models\JobApplicationModel;
 use App\Pages\JobRenderer;
 
@@ -13,7 +14,7 @@ class JobApplicationController
         $applicationSuccess = JobApplicationModel::createJobApplication($data);
 
         if ($applicationSuccess) {
-            header('Location: /praksa-projekat-1/src/Pages/success.php');
+            SuccessManager::redirectToSuccessPage('sent-application');
         }
         else {
             ErrorManager::redirectToErrorPage('failed-application');

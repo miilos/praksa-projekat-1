@@ -7,7 +7,6 @@ use App\Pages\FormRenderer;
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 $errors = [];
-$formRenderer = new FormRenderer();
 
 // if the signup form was submitted, get the request body, validate it and create new user
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -40,12 +39,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <h1 class="form-title">Sign up</h1>
 
         <?php
-            echo $formRenderer->renderFormField('<input type="text" id="firstName" name="firstName" placeholder="Ime" class="input">', $errors['firstName'] ?? null);
-            echo $formRenderer->renderFormField('<input type="text" id="lastName" name="lastName" placeholder="Prezime" class="input">', $errors['lastName'] ?? null);
-            echo $formRenderer->renderFormField('<input type="text" id="email" name="email" placeholder="Email adresa" class="input">', $errors['email'] ?? null);
-            echo $formRenderer->renderFormField('<input type="password" id="password" name="password" placeholder="Password" class="input">', $errors['password'] ?? null);
-            echo $formRenderer->renderFormField('<input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" class="input">', $errors['passwordConfirm'] ?? null);
-            echo $formRenderer->renderFormField(
+            echo FormRenderer::renderFormField('<input type="text" id="firstName" name="firstName" placeholder="Ime" class="input">', $errors['firstName'] ?? null);
+            echo FormRenderer::renderFormField('<input type="text" id="lastName" name="lastName" placeholder="Prezime" class="input">', $errors['lastName'] ?? null);
+            echo FormRenderer::renderFormField('<input type="text" id="email" name="email" placeholder="Email adresa" class="input">', $errors['email'] ?? null);
+            echo FormRenderer::renderFormField('<input type="password" id="password" name="password" placeholder="Password" class="input">', $errors['password'] ?? null);
+            echo FormRenderer::renderFormField('<input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" class="input">', $errors['passwordConfirm'] ?? null);
+            echo FormRenderer::renderFormField(
                     '<select name="field" class="input">
                             <option value="-">Izaberite polje rada...</option>
                             <option value="it">IT</option>

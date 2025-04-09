@@ -5,9 +5,8 @@ use App\Core\Db;
 use App\Managers\ErrorManager;
 use Ramsey\Uuid\Uuid;
 
-class UserModel
+class UserModel extends Model
 {
-    private $errors = [];
     private const PASS_LENGTH = 8;
 
     public function __construct(
@@ -58,11 +57,6 @@ class UserModel
         }
 
         return empty($this->errors);
-    }
-
-    public function getValidationErrors(): array
-    {
-        return $this->errors;
     }
 
     private function getEmailsInDB(): array

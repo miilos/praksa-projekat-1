@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Managers\SuccessManager;
 use App\Models\JobModel;
 use App\Pages\JobRenderer;
 
@@ -9,14 +10,13 @@ class JobController
 {
     public function getJobs(string $title, array $filter = []): void
     {
-        $jobModel = new JobModel();
         $jobs = [];
 
         if ($filter) {
-           $jobs = $jobModel->getJobs($filter);
+           $jobs = JobModel::getJobs($filter);
         }
         else {
-            $jobs = $jobModel->getJobs();
+            $jobs = JobModel::getJobs();
         }
 
         $jobRenderer = new JobRenderer();
@@ -27,12 +27,35 @@ class JobController
 
     public function getFilteredJobs(string $title, array $filter): void
     {
-        $jobModel = new JobModel();
-        $jobs = $jobModel->filterJobs($filter);
+        $jobs = JobModel::filterJobs($filter);
 
         $jobRenderer = new JobRenderer();
         $html = $jobRenderer->renderJobs($title, $jobs);
 
         echo $html;
+    }
+
+    public function createJob(array $data): array|bool
+    {
+        $jobModel = new JobModel(
+            $data['employerId'],
+            $data['jobName'],
+            $data['description'],
+            $data['field'],
+            (int)$data['startSalary'],
+            $data['shifts'],
+            $data['location'],
+            isset($data['flexibleHours']) ? true : false,
+            isset($data['workFromHome']) ? true : false
+        );
+
+        if ($jobModel->validate()) {
+            $jobModel->createJob();
+            SuccessManager::redirectToSuccessPage('job-created');
+            return true;
+        }
+        else {
+           return $jobModel->getValidationErrors();
+        }
     }
 }

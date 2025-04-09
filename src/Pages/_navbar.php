@@ -12,6 +12,9 @@ $user = SessionManager::getSessionData('user');
         <li class="nav-item">
             <a href="/praksa-projekat-1/index.php" class="nav-item-link">Svi oglasi</a>
         </li>
+        <li class="nav-item">
+            <a href="/praksa-projekat-1/src/Pages/createJob.php" class="nav-item-link">Kreiranje oglasa</a>
+        </li>
     </ul>
 
     <ul class="nav-list nav-list__users">

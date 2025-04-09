@@ -19,6 +19,7 @@ class ErrorManager
             'db-error' => 'Greska pri povezivanju sa bazom',
             'bad-job-id' => 'Oglas koji trazite ne postoji',
             'failed-application' => 'Vasa prijava nije poslata. Probajte ponovo',
+            'not-authorized' => 'Nemate dozvolu da pristupite ovoj stranici',
             'unknown-error' => 'Nesto ne radi'
         ];
     }

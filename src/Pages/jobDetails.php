@@ -7,8 +7,7 @@ use App\Models\JobApplicationModel;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
-    $jobModel = new JobModel();
-    $job = $jobModel->getJobById($_GET['id']);
+    $job = JobModel::getJobById($_GET['id']);
 
     if (!$job) {
         ErrorManager::redirectToErrorPage('bad-job-id');
@@ -44,6 +43,12 @@ require_once __DIR__ . '../../../vendor/autoload.php';
                     schedule
                 </span>
                 <?php echo date('j.n.Y.', strtotime($job['createdAt'])) ?>
+            </div>
+            <div>
+                <span class="material-symbols-outlined">
+                    update
+                </span>
+                <?php echo $job['shifts'] === 1 ? $job['shifts'] . ' smena' : $job['shifts'] . ' smene' ?>
             </div>
         </div>
         <div class="job-header-extra-info">

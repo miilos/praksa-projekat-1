@@ -20,6 +20,9 @@ $user = SessionManager::getSessionData('user');
                 <li class="nav-item">
                     <a href="/praksa-projekat-1/src/Pages/updateSelectionPage.php" class="nav-item-link">Azuriranje oglasa</a>
                 </li>
+                <li class="nav-item">
+                    <a href="/praksa-projekat-1/src/Pages/deleteSelectionPage.php" class="nav-item-link">Brisanje oglasa</a>
+                </li>
             ';
         }
         ?>

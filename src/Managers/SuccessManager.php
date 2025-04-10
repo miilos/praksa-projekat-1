@@ -16,6 +16,7 @@ class SuccessManager
             'sent-application' => [ 'pageHeader' => 'Uspesna prijava!', 'text' => 'Vasa prijava je uspesno poslata poslodavcu!' ],
             'job-created' => [ 'pageHeader' => 'Oglas kreiran!', 'text' => 'Uspesno ste kreirali oglas za posao!' ],
             'update-success' => [ 'pageHeader' => 'Oglas izmenjen!', 'text' => 'Uspesno ste izmenili oglas!' ],
+            'delete-success' => [ 'pageHeader' => 'Oglas je obrisan!', 'text' => 'Uspesno ste obrisali oglas!' ],
         ];
     }
 }

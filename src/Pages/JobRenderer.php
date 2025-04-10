@@ -104,16 +104,16 @@ class JobRenderer
         return substr_replace($salary, '.', -3, 0);
     }
 
-    public function renderJobsAdminView(array $jobs, string $operation): string
+    public function renderJobsAdminView(array $jobs, string $operation, string $btnLinkPage): string
     {
         $html = '
             <div class="job-admin-container">
-                <h1 class="job-admin-container-title">Izaberite posao</h1>        
+                <h1 class="job-admin-container-title">Izaberite posao</h1>      
         ';
 
         if ($jobs) {
             foreach ($jobs as $job) {
-                $html .= $this->renderJobAdmin($job, $operation);
+                $html .= $this->renderJobAdmin($job, $operation, $btnLinkPage);
             }
         }
         else {
@@ -124,12 +124,12 @@ class JobRenderer
         return $html;
     }
 
-    private function renderJobAdmin(array $job, string $operation): string
+    private function renderJobAdmin(array $job, string $operation, $btnLinkPage): string
     {
         $html = '
             <div class="job-admin">
                 <h2 class="job-admin-name">' . $job['jobName'] . '</h2>
-                <a class="btn btn--primary" href="/praksa-projekat-1/src/Pages/updateJob.php?id=' . $job['jobId'] . '">' . $operation . '</a>
+                <a class="btn btn--primary" href="/praksa-projekat-1/src/Pages/' . $btnLinkPage . '?id=' . $job['jobId'] . '">' . $operation . '</a>
             </div>
         ';
 

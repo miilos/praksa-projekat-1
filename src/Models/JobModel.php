@@ -277,4 +277,26 @@ class JobModel extends Model
             return false;
         }
     }
+
+    public static function deleteJob(string $id): bool
+    {
+        try {
+            $dbh = (new Db())->getConnection();
+
+            $query = "DELETE FROM jobs WHERE jobId=:jobId";
+            $stmt = $dbh->prepare($query);
+            $stmt->bindParam(':jobId', $id);
+
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        }
+        catch (\PDOException $e) {
+            ErrorManager::redirectToErrorPage('db-error');
+            return false;
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+            return false;
+        }
+    }
 }

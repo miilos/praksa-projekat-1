@@ -35,12 +35,12 @@ class JobController
         echo $html;
     }
 
-    public function getJobsAdmin(): void
+    public function getJobsAdmin(string $operation, string $btnLinkPage): void
     {
         $jobs = JobModel::getJobNames();
 
         $jobRenderer = new JobRenderer();
-        $html = $jobRenderer->renderJobsAdminView($jobs, 'Update');
+        $html = $jobRenderer->renderJobsAdminView($jobs, $operation, $btnLinkPage);
 
         echo $html;
     }
@@ -72,5 +72,10 @@ class JobController
     public function updateJob(string $id, array $data): bool
     {
         return JobModel::updateJob($id, $data);
+    }
+
+    public function deleteJob(string $id): bool
+    {
+        return JobModel::deleteJob($id);
     }
 }

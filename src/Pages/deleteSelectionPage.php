@@ -22,14 +22,14 @@ if (!$user || $user['role'] !== 'admin') {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="../../style/style.css">
-    <title>Izmenite oglas</title>
+    <title>Obrisite oglas</title>
 </head>
 <body>
-    <?php
-        include './_navbar.php';
+<?php
+    include './_navbar.php';
 
-        $jobController = new JobController();
-        $jobController->getJobsAdmin('Update', 'updateJob.php');
-    ?>
+    $jobController = new JobController();
+    $jobController->getJobsAdmin('Delete', 'deleteJob.php');
+?>
 </body>
 </html>

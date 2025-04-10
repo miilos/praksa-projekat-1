@@ -21,7 +21,8 @@ class ErrorManager
             'failed-application' => 'Vasa prijava nije poslata. Probajte ponovo',
             'not-authorized' => 'Nemate dozvolu da pristupite ovoj stranici',
             'unknown-error' => 'Nesto ne radi',
-            'update-error' => 'Greska pri azuriranju'
+            'update-error' => 'Greska pri azuriranju',
+            'delete-error' => 'Greska pri brisanju',
         ];
     }
 }

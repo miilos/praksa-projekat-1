@@ -155,6 +155,28 @@ class JobModel extends Model
         return [];
     }
 
+    public static function getJobNames(): array
+    {
+        try {
+            $dbh = (new Db())->getConnection();
+
+            $query = "SELECT jobId, jobName FROM jobs";
+            $stmt = $dbh->prepare($query);
+            $stmt->execute();
+            $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            return $jobs;
+        }
+        catch (\PDOException $e) {
+            ErrorManager::redirectToErrorPage('db-error');
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+        }
+
+        return [];
+    }
+
     public function validate(): bool
     {
         if ($this->employerId === '-') {
@@ -214,6 +236,45 @@ class JobModel extends Model
         }
         catch (\Throwable $t) {
             ErrorManager::redirectToErrorPage('unknown-error');
+        }
+    }
+
+    public static function updateJob(string $id, array $data): bool
+    {
+        try {
+            $dbh = (new Db())->getConnection();
+
+            $query = "UPDATE jobs SET {{newValues}} WHERE jobId=:jobId";
+
+            $newValues = '';
+            foreach ($data as $key => $value) {
+                $newValues .= "$key=:$key, ";
+            }
+            $newValues = substr($newValues, 0, -2);
+
+            $query = str_replace("{{newValues}}", $newValues, $query);
+
+            $stmt = $dbh->prepare($query);
+            foreach ($data as $key => $value) {
+                if ($key === 'flexibleHours' || $key === 'workFromHome') {
+                    $value = ($value === 'on') ? 1 : 0;
+                }
+
+                $stmt->bindValue(":$key", $value);
+            }
+            $stmt->bindParam(':jobId', $id);
+
+            $stmt->execute();
+
+            return $stmt->rowCount() > 0;
+        }
+        catch (\PDOException $e) {
+            ErrorManager::redirectToErrorPage('db-error');
+            return false;
+        }
+        catch (\Throwable $t) {
+            ErrorManager::redirectToErrorPage('unknown-error');
+            return false;
         }
     }
 }

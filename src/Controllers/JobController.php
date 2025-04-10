@@ -35,6 +35,16 @@ class JobController
         echo $html;
     }
 
+    public function getJobsAdmin(): void
+    {
+        $jobs = JobModel::getJobNames();
+
+        $jobRenderer = new JobRenderer();
+        $html = $jobRenderer->renderJobsAdminView($jobs, 'Update');
+
+        echo $html;
+    }
+
     public function createJob(array $data): array|bool
     {
         $jobModel = new JobModel(
@@ -57,5 +67,10 @@ class JobController
         else {
            return $jobModel->getValidationErrors();
         }
+    }
+
+    public function updateJob(string $id, array $data): bool
+    {
+        return JobModel::updateJob($id, $data);
     }
 }

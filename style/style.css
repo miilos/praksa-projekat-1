@@ -33,14 +33,24 @@ body {
 }
 
 .nav-list {
-    width: 15%;
     height: 100%;
     list-style-type: none;
 
     display: flex;
     align-items: center;
-    justify-content: center;
     gap: 1rem;
+}
+
+.nav-list__menu {
+    width: 70%;
+    justify-content: flex-start;
+    padding-left: 2rem;
+}
+
+.nav-list__users {
+    width: 30%;
+    justify-content: flex-end;
+    padding-right: 2rem;
 }
 
 .nav-item-link {
@@ -374,4 +384,23 @@ label[for="flexibleHours"] {
 
 .not-logged-in a {
     margin-top: 1rem;
+}
+
+/* job admin view styles */
+
+.job-admin-container {
+    width: 50%;
+    margin: 5rem auto;
+}
+
+.job-admin {
+    width: 100%;
+    padding: 2rem;
+    border: 2px solid var(--color-primary);
+    border-radius: 2rem;
+    margin-top: 2rem;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }

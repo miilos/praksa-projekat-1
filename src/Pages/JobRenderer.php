@@ -103,4 +103,36 @@ class JobRenderer
     {
         return substr_replace($salary, '.', -3, 0);
     }
+
+    public function renderJobsAdminView(array $jobs, string $operation): string
+    {
+        $html = '
+            <div class="job-admin-container">
+                <h1 class="job-admin-container-title">Izaberite posao</h1>        
+        ';
+
+        if ($jobs) {
+            foreach ($jobs as $job) {
+                $html .= $this->renderJobAdmin($job, $operation);
+            }
+        }
+        else {
+            $html .= '<h3>Jos nema oglasa za posao</h3>';
+        }
+
+        $html .= '</div>';
+        return $html;
+    }
+
+    private function renderJobAdmin(array $job, string $operation): string
+    {
+        $html = '
+            <div class="job-admin">
+                <h2 class="job-admin-name">' . $job['jobName'] . '</h2>
+                <a class="btn btn--primary" href="/praksa-projekat-1/src/Pages/updateJob.php?id=' . $job['jobId'] . '">' . $operation . '</a>
+            </div>
+        ';
+
+        return $html;
+    }
 }

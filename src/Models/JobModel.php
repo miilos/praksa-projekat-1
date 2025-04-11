@@ -6,6 +6,7 @@ use App\Core\Db;
 use App\Managers\ErrorManager;
 use App\Managers\SuccessManager;
 use Ramsey\Uuid\Uuid;
+use App\Core\QueryBuilder;
 
 class JobModel extends Model
 {
@@ -25,104 +26,52 @@ class JobModel extends Model
     // for additional filtering, filterJobs() is used
     public static function getJobs(array $filter = []): array
     {
-        try {
-            $dbh = (new Db())->getConnection();
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
+        $qb->fields('*');
+        $qb->table('jobs');
+        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
 
-            $query = "SELECT * FROM jobs j INNER JOIN employers e ON j.employerId = e.employerId";
-
-            if ($filter) {
-                $query .= " WHERE";
-                foreach ($filter as $field => $value) {
-                    $query .= " $field=:$field AND";
-                }
-
-                // remove trailing AND from SQL query
-                $query = substr($query, 0, -3);
-            }
-
-            $stmt = $dbh->prepare($query);
-
+        if ($filter) {
             foreach ($filter as $field => $value) {
-                $stmt->bindParam(":$field", $value);
+                $qb->where([$field => $value]);
             }
-
-            $stmt->execute();
-            $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return $jobs;
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
-        return [];
+        $qb->build();
+        return $qb->execute();
     }
 
     public static function filterJobs(array $filters): array
     {
-        try {
-            $dbh = (new Db())->getConnection();
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
+        $qb->fields('*');
+        $qb->table('jobs');
+        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
 
-            $query = "SELECT * FROM jobs j INNER JOIN employers e ON j.employerId = e.employerId";
+        $filtersNotEmpty = self::checkFiltersEmpty($filters);
+        if ($filtersNotEmpty) {
+            foreach ($filters as $field => $value) {
+                if (!$value) continue;
 
-            // if the filters are specified, build the sql query by chaining conditions
-            // of the filters that are set
-            // if not, skip the query building and execute it as is
-
-            $filtersNotEmpty = self::checkFiltersEmpty($filters);
-            if ($filtersNotEmpty) {
-                $query .= " WHERE";
-
-                foreach ($filters as $field => $value) {
-                    if (!$value) {
-                        continue;
-                    }
-
-                    switch ($field) {
-                        case 'name':
-                            $query .= " j.jobName LIKE :$field";
-                            break;
-                        case 'location':
-                            $query .= " j.location = :$field";
-                            break;
-                        case 'flexibleHours':
-                            $query .= " j.flexibleHours = 1";
-                            break;
-                        case 'workFromHome':
-                            $query .= " j.workFromHome = 1";
-                            break;
-                    }
-                    $query .= " AND";
+                switch ($field) {
+                    case 'jobName':
+                        $qb->where([$field => "%$value%"], 'LIKE');
+                        break;
+                    case 'location':
+                        $qb->where([$field => $value]);
+                        break;
+                    case 'flexibleHours':
+                    case 'workFromHome':
+                        $qb->where([$field => 1]);
+                        break;
                 }
-                $query = substr($query, 0, -3);
             }
-
-            $stmt = $dbh->prepare($query);
-
-            if ($filtersNotEmpty && $filters['name']) {
-                $stmt->bindValue(':name', '%'.$filters['name'].'%', \PDO::PARAM_STR);
-            }
-
-            if ($filtersNotEmpty && $filters['location']) {
-                $stmt->bindValue(':location', $filters['location'], \PDO::PARAM_STR);
-            }
-
-            $stmt->execute();
-            $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return $jobs;
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
         }
 
-        return [];
+        $qb->build();
+        return $qb->execute();
     }
 
     private static function checkFiltersEmpty(array $filters): bool
@@ -130,51 +79,26 @@ class JobModel extends Model
         return count(array_filter($filters)) > 0;
     }
 
-    public static function getJobById(string $id): array | bool
+    public static function getJobById(string $id): array
     {
-        try {
-            $dbh = (new Db())->getConnection();
-
-            $query = "SELECT * FROM jobs j INNER JOIN employers e ON j.employerId = e.employerId WHERE jobId=:jobId";
-
-            $stmt = $dbh->prepare($query);
-            $stmt->bindParam(':jobId', $id);
-
-            $stmt->execute();
-            $job = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            return $job;
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-        }
-
-        return [];
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
+        $qb->fields('*');
+        $qb->table('jobs');
+        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+        $qb->where(['jobId' => $id]);
+        $qb->build();
+        return $qb->execute('one');
     }
 
     public static function getJobNames(): array
     {
-        try {
-            $dbh = (new Db())->getConnection();
-
-            $query = "SELECT jobId, jobName FROM jobs";
-            $stmt = $dbh->prepare($query);
-            $stmt->execute();
-            $jobs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-
-            return $jobs;
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-        }
-
-        return [];
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
+        $qb->fields('jobId', 'jobName');
+        $qb->table('jobs');
+        $qb->build();
+        return $qb->execute();
     }
 
     public function validate(): bool

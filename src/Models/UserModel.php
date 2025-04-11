@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Core\Db;
+use App\Core\QueryBuilder;
 use App\Managers\ErrorManager;
 use Ramsey\Uuid\Uuid;
 
@@ -61,24 +62,31 @@ class UserModel extends Model
 
     private function getEmailsInDB(): array
     {
-        try {
-            $dbh = (new Db())->getConnection();
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
+        $qb->fields('email');
+        $qb->table('users');
+        $qb->build();
+        return $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
 
-            $stmt = $dbh->prepare('SELECT email FROM users');
-            $stmt->execute();
-
-            $emails = $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
-            return $emails;
-        }
-        catch (\PDOException $e) {
-            $msg = ErrorManager::getErrors()['db-error'];
-            ErrorManager::redirectToErrorPage($msg);
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-        }
-
-        return [];
+//        try {
+//            $dbh = (new Db())->getConnection();
+//
+//            $stmt = $dbh->prepare('SELECT email FROM users');
+//            $stmt->execute();
+//
+//            $emails = $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
+//            return $emails;
+//        }
+//        catch (\PDOException $e) {
+//            $msg = ErrorManager::getErrors()['db-error'];
+//            ErrorManager::redirectToErrorPage($msg);
+//        }
+//        catch (\Throwable $t) {
+//            ErrorManager::redirectToErrorPage('unknown-error');
+//        }
+//
+//        return [];
     }
 
     public function createUser(): array
@@ -122,26 +130,15 @@ class UserModel extends Model
         return [];
     }
 
+    // return array with user if user is found, bool if there's no user because execute() uses fetch()
     public static function getUserByEmail(string $email): array|bool
     {
-        try {
-            $dbh = (new Db())->getConnection();
-
-            $query = "SELECT * FROM users WHERE email=:email";
-            $stmt = $dbh->prepare($query);
-            $stmt->bindParam(':email', $email);
-
-            $stmt->execute();
-
-            return $stmt->fetch(\PDO::FETCH_ASSOC);
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-        }
-
-        return [];
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
+        $qb->fields('*');
+        $qb->table('users');
+        $qb->where(['email' => $email]);
+        $qb->build();
+        return $qb->execute('one');
     }
 }

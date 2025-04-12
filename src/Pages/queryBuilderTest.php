@@ -21,11 +21,17 @@ WHERE a.userId = :userId
 */
 
 $qb->operation('SELECT');
-$qb->fields('jobId', 'employerId', 'jobName', 'description', 'field',
+$qb->fields(['field' => 'jobId', 'table' => 'jobs'],
+    ['field' => 'employerId', 'table' => 'jobs'],
+    ['field' => 'jobName', 'table' => 'jobs'],
+    ['field' => 'description', 'table' => 'jobs'],
+    ['field' => 'field', 'table' => 'jobs'],
     'startSalary', 'location', 'createdAt', 'flexibleHours', 'workFromHome',
-    'submittedAt', 'userId', 'employerName');
+    ['field' => 'submittedAt', 'table' => 'applications'], ['field' => 'userId', 'table' => 'applications'],
+    ['field' => 'employerName', 'table' => 'employers']);
 $qb->table('applications');
 $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
 $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+$qb->where([ 'userId' => '16cba2b1-58a9-438f-aa67-92e8715be11d' ], table: 'applications');
 $qb->build();
 var_dump($qb->execute());

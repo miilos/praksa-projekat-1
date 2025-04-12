@@ -12,7 +12,7 @@ class QueryBuilder
     private string $operation;
     private string $table;
     private string $join = '';
-    private string $fields;
+    private string $fields = '';
     private array $data;
     private array $bindings = [];
     private string $conditionsString = '';
@@ -31,14 +31,35 @@ class QueryBuilder
     {
         $baseTableQualifier = $this->table[0];
         $joinTableQualifier = $joinTable[0];
+        $previousJoinTableQualifier = '';
 
-        $this->join = "$baseTableQualifier $joinType $joinTable $joinTableQualifier 
-                       ON $baseTableQualifier.$baseTableField $operation $joinTableQualifier.$joinTableField";
+        if ($this->join) {
+            $lastQualifierIndex = (strrpos($this->join, '.')) - 1;
+            $previousJoinTableQualifier = $this->join[$lastQualifierIndex];
+
+            // if a join already exists, $baseTableField refers to the field from the last table joined
+            $this->join .= " $joinType $joinTable $joinTableQualifier
+                           ON $previousJoinTableQualifier.$baseTableField $operation $joinTableQualifier.$joinTableField";
+        }
+        else {
+            $this->join .= " $baseTableQualifier $joinType $joinTable $joinTableQualifier 
+                           ON $baseTableQualifier.$baseTableField $operation $joinTableQualifier.$joinTableField";
+        }
     }
 
-    public function fields(string ...$fields): void
+    public function fields(mixed ...$fields): void
     {
-        $this->fields = implode(', ', $fields);
+        foreach ($fields as $field) {
+            if (is_string($field)) {
+                $this->fields .= "$field, ";
+            }
+
+            if (is_array($field)) {
+                $this->fields .= (substr($field['table'], 0, 1) . '.' . $field['field'] . ', ');
+            }
+        }
+
+        $this->fields = substr($this->fields, 0, -2);
     }
 
     public function data(array $data): void
@@ -46,10 +67,16 @@ class QueryBuilder
         $this->data = $data;
     }
 
-    public function where(array $condition, string $operation = '=', string $separator = 'AND'): void
+    public function where(array $condition, string $operation = '=', string $separator = 'AND', string $table = ''): void
     {
         $this->bindings[] = $condition;
-        $this->conditionsString .= (key($condition) . " $operation :" . key($condition) . " $separator ");
+
+        if ($table) {
+            $this->conditionsString .= ($table[0] . '.' . key($condition) . " $operation :" . key($condition) . " $separator ");
+        }
+        else {
+            $this->conditionsString .= (key($condition) . " $operation :" . key($condition) . " $separator ");
+        }
     }
 
     public function build(): void

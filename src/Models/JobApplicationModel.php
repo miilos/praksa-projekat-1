@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Core\Db;
+use App\Core\QueryBuilder;
 use App\Managers\ErrorManager;
 use PDO;
 use Ramsey\Uuid\Uuid;
@@ -40,44 +41,40 @@ class JobApplicationModel
 
     public static function getJobsAppliedToByUser(string $userId, bool $onlyIds = false): array
     {
-        try {
-            $dbh = (new Db())->getConnection();
+        $qb = new QueryBuilder();
+        $qb->operation('SELECT');
 
-            $query = "";
-            if ($onlyIds) {
-                $query = "SELECT j.jobId, a.submittedAt
-                            FROM applications a
-                            INNER JOIN jobs j
-                            ON a.jobId = j.jobId
-                            WHERE a.userId = :userId";
-            }
-            else {
-                $query = "SELECT j.jobId, j.employerId, j.jobName,
-                        j.description, j.field, j.startSalary, j.location,
-                        j.createdAt, j.flexibleHours, j.workFromHome,
-                        a.submittedAt, a.userId,
-                        e.employerName
-                        FROM applications a
-                        INNER JOIN jobs j
-                        ON a.jobId = j.jobId
-                        INNER JOIN employers e
-                        ON j.employerId = e.employerId
-                        WHERE a.userId = :userId";
-            }
-
-            $stmt = $dbh->prepare($query);
-            $stmt->bindParam(':userId', $userId);
-            $stmt->execute();
-
-            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        if ($onlyIds) {
+            $qb->fields(
+                [ 'field' => 'jobId', 'table' => 'jobs' ],
+                [ 'field' => 'submittedAt', 'table' => 'applications' ]
+            );
+            $qb->table('applications');
+            $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
         }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
+        else {
+            $qb->fields(
+                ['field' => 'jobId', 'table' => 'jobs'],
+                ['field' => 'employerId', 'table' => 'jobs'],
+                ['field' => 'jobName', 'table' => 'jobs'],
+                ['field' => 'description', 'table' => 'jobs'],
+                ['field' => 'field', 'table' => 'jobs'],
+                ['field' => 'startSalary', 'table' => 'jobs'],
+                ['field' => 'location', 'table' => 'jobs'],
+                ['field' => 'createdAt', 'table' => 'jobs'],
+                ['field' => 'flexibleHours', 'table' => 'jobs'],
+                ['field' => 'workFromHome', 'table' => 'jobs'],
+                ['field' => 'submittedAt', 'table' => 'applications'],
+                ['field' => 'userId', 'table' => 'applications'],
+                ['field' => 'employerName', 'table' => 'employers']
+            );
+            $qb->table('applications');
+            $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
+            $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
         }
 
-        return [];
+        $qb->where([ 'userId' => $userId ], table: 'applications');
+        $qb->build();
+        return $qb->execute();
     }
 }

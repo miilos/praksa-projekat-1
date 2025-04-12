@@ -2,9 +2,7 @@
 
 namespace App\Core;
 
-use App\Core\Db;
 use App\Managers\ErrorManager;
-use App\Managers\SuccessManager;
 
 class QueryBuilder
 {
@@ -112,12 +110,11 @@ class QueryBuilder
 
     private function buildSelect(): void
     {
-        // remove trailing condition from $conditionsString
-        $this->conditionsString = substr($this->conditionsString, 0, -4);
-
         $this->query = "$this->operation $this->fields FROM $this->table $this->join";
 
         if ($this->conditionsString) {
+            // remove trailing condition from $conditionsString
+            $this->conditionsString = substr($this->conditionsString, 0, -4);
             $this->query .= " WHERE $this->conditionsString";
         }
     }
@@ -129,18 +126,22 @@ class QueryBuilder
 
     private function buildUpdate(): void
     {
-        $this->conditionsString = substr($this->conditionsString, 0, -4);
-
         $this->query = "$this->operation $this->table SET $this->valuesString";
 
         if ($this->conditionsString) {
+            $this->conditionsString = substr($this->conditionsString, 0, -4);
             $this->query .= " WHERE $this->conditionsString";
         }
     }
 
     private function buildDelete(): void
     {
+        $this->query = "$this->operation FROM $this->table";
 
+        if ($this->conditionsString) {
+            $this->conditionsString = substr($this->conditionsString, 0, -4);
+            $this->query .= " WHERE $this->conditionsString";
+        }
     }
 
     public function execute(string $fetch = 'all', int $fetchMode = \PDO::FETCH_ASSOC): array|bool
@@ -176,21 +177,16 @@ class QueryBuilder
         catch (\PDOException $e) {
             echo $e->getMessage();
             $this->close();
-            //ErrorManager::redirectToErrorPage('db-error');
+            ErrorManager::redirectToErrorPage('db-error');
             return [];
         }
         catch (\Throwable $t) {
             echo $t->getMessage();
             $this->close();
-            //ErrorManager::redirectToErrorPage('unknown-error');
+            ErrorManager::redirectToErrorPage('unknown-error');
             return [];
         }
     }
-
-    // INSERT INTO table (fields) VALUES(values)
-    // SELECT fields FROM table WHERE condition
-    // UPDATE table SET field=value WHERE condition
-    // DELETE FROM table WHERE condition
 
     public function close(): void
     {

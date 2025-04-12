@@ -13,6 +13,8 @@ class EmployerModel
         $qb->fields('employerId', 'employerName');
         $qb->table('employers');
         $qb->build();
-        return $qb->execute();
+        $employers = $qb->execute();
+        $qb->close();
+        return $employers;
     }
 }

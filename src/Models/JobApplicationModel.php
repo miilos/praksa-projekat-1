@@ -12,31 +12,20 @@ class JobApplicationModel
 {
     public static function createJobApplication(array $data): bool
     {
-        try {
-            $dbh = (new Db())->getConnection();
-
-            $query = "INSERT INTO applications(applicationId, userId, jobId) VALUES(:applicationId, :userId, :jobId)";
-
-            $applicationId = Uuid::uuid4();
-            $stmt = $dbh->prepare($query);
-
-            $stmt->bindParam(':applicationId', $applicationId);
-            $stmt->bindParam(':userId', $data['userId']);
-            $stmt->bindParam(':jobId', $data['jobId']);
-
-            $stmt->execute();
-
-            return $stmt->rowCount() === 1;
-        }
-        catch (\PDOException $e) {
-            echo $e->getMessage();
-            //ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-        }
-
-        return true;
+        $applicationId = Uuid::uuid4();
+        $qb = new QueryBuilder();
+        $qb->operation('INSERT');
+        $qb->table('applications');
+        $qb->fields('applicationId', 'userId', 'jobId');
+        $qb->values([
+            'applicationId' => $applicationId,
+            'userId' => $data['userId'],
+            'jobId' => $data['jobId']
+        ]);
+        $qb->build();
+        $status = $qb->execute();
+        $qb->close();
+        return $status;
     }
 
     public static function getJobsAppliedToByUser(string $userId, bool $onlyIds = false): array
@@ -75,6 +64,8 @@ class JobApplicationModel
 
         $qb->where([ 'userId' => $userId ], table: 'applications');
         $qb->build();
-        return $qb->execute();
+        $applications = $qb->execute();
+        $qb->close();
+        return $applications;
     }
 }

@@ -1,14 +1,12 @@
 <?php
 
 namespace App\Models;
-use App\Core\Db;
 use App\Core\QueryBuilder;
-use App\Managers\ErrorManager;
 use Ramsey\Uuid\Uuid;
 
 class UserModel extends Model
 {
-    private const PASS_LENGTH = 8;
+    private const int PASS_LENGTH = 8;
 
     public function __construct(
         protected string $firstName,
@@ -67,67 +65,44 @@ class UserModel extends Model
         $qb->fields('email');
         $qb->table('users');
         $qb->build();
-        return $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
-
-//        try {
-//            $dbh = (new Db())->getConnection();
-//
-//            $stmt = $dbh->prepare('SELECT email FROM users');
-//            $stmt->execute();
-//
-//            $emails = $stmt->fetchAll(\PDO::FETCH_COLUMN, 0);
-//            return $emails;
-//        }
-//        catch (\PDOException $e) {
-//            $msg = ErrorManager::getErrors()['db-error'];
-//            ErrorManager::redirectToErrorPage($msg);
-//        }
-//        catch (\Throwable $t) {
-//            ErrorManager::redirectToErrorPage('unknown-error');
-//        }
-//
-//        return [];
+        $emails = $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
+        $qb->close();
+        return $emails;
     }
 
     public function createUser(): array
     {
-        $dbh = (new Db())->getConnection();
-        $uuid = Uuid::uuid4();
+        $userId = Uuid::uuid4();
         $this->password = password_hash($this->password, PASSWORD_BCRYPT);
 
-        try {
-            $query = "INSERT INTO users(userId, firstname, lastname, email, password, field) VALUES (:id, :firstName, :lastName, :email, :password, :field)";
+        $qb = new QueryBuilder();
+        $qb->operation('INSERT');
+        $qb->table('users');
+        $qb->fields('userId', 'firstName', 'lastName', 'email', 'password', 'field');
+        $qb->values([
+            'userId' => $userId,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'email' => $this->email,
+            'password' => $this->password,
+            'field' => $this->field
+        ]);
+        $qb->build();
+        $qb->execute();
+        $qb->close();
 
-            $stmt = $dbh->prepare($query);
-            $stmt->bindParam(':id', $uuid);
-            $stmt->bindParam(':firstName', $this->firstName);
-            $stmt->bindParam(':lastName', $this->lastName);
-            $stmt->bindParam(':email',$this->email);
-            $stmt->bindParam(':password', $this->password);
-            $stmt->bindParam(':field', $this->field);
-
-            $stmt->execute();
-
-            // builds an array that looks like what fetching the new user from the database would look like,
-            // so that there's no need for another query to add user data to the session variable
-            unset($this->passwordConfirm);
-            return [
-                'userId' => $uuid,
-                'firstName' => $this->firstName,
-                'lastName' => $this->lastName,
-                'email' => $this->email,
-                'password' => $this->password,
-                'field' => $this->field
-            ];
-        }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-        }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-        }
-
-        return [];
+        // builds an array that looks like what fetching the new user from the database would look like,
+        // so that there's no need for another query to add user data to the session variable
+        unset($this->passwordConfirm);
+        return [
+            'userId' => $userId,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
+            'email' => $this->email,
+            'password' => $this->password,
+            'field' => $this->field,
+            'role' => 'user'
+        ];
     }
 
     // return array with user if user is found, bool if there's no user because execute() uses fetch()
@@ -139,6 +114,8 @@ class UserModel extends Model
         $qb->table('users');
         $qb->where(['email' => $email]);
         $qb->build();
-        return $qb->execute('one');
+        $user = $qb->execute('one');
+        $qb->close();
+        return $user;
     }
 }

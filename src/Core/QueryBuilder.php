@@ -13,9 +13,11 @@ class QueryBuilder
     private string $table;
     private string $join = '';
     private string $fields = '';
-    private array $data;
     private array $bindings = [];
     private string $conditionsString = '';
+    private string $valuesString = '';
+    private $conn;
+    private $stmt;
 
     public function operation(string $operation): void
     {
@@ -62,9 +64,13 @@ class QueryBuilder
         $this->fields = substr($this->fields, 0, -2);
     }
 
-    public function data(array $data): void
+    public function values(array $data): void
     {
-        $this->data = $data;
+        foreach ($data as $field => $value) {
+            $this->bindings[] = [ $field => $value ];
+            $this->valuesString .= ":$field, ";
+        }
+        $this->valuesString = substr($this->valuesString, 0, -2);
     }
 
     public function where(array $condition, string $operation = '=', string $separator = 'AND', string $table = ''): void
@@ -111,7 +117,7 @@ class QueryBuilder
 
     private function buildInsert(): void
     {
-
+        $this->query = "$this->operation INTO $this->table ($this->fields) VALUES ($this->valuesString)";
     }
 
     private function buildUpdate(): void
@@ -127,35 +133,42 @@ class QueryBuilder
     public function execute(string $fetch = 'all', int $fetchMode = \PDO::FETCH_ASSOC): array|bool
     {
         try {
-            $dbh = (new Db())->getConnection();
+            $this->conn = (new Db())->getConnection();
 
-            $stmt = $dbh->prepare($this->query);
+            $this->stmt = $this->conn->prepare($this->query);
 
             if ($this->bindings) {
                 foreach ($this->bindings as $binding) {
-                    $stmt->bindValue(':' . key($binding), $binding[key($binding)]);
+                    $this->stmt->bindValue(':' . key($binding), $binding[key($binding)]);
                 }
             }
 
-            $stmt->execute();
+            $this->stmt->execute();
 
-            if ($fetch === 'all') {
-                if ($fetchMode === \PDO::FETCH_COLUMN) {
-                    return $stmt->fetchAll($fetchMode, 0);
+            if ($this->operation === 'SELECT') {
+                if ($fetch === 'all') {
+                    if ($fetchMode === \PDO::FETCH_COLUMN) {
+                        return $this->stmt->fetchAll($fetchMode, 0);
+                    }
+                    return $this->stmt->fetchAll($fetchMode);
                 }
-                return $stmt->fetchAll($fetchMode);
+                else {
+                    return $this->stmt->fetch($fetchMode);
+                }
             }
             else {
-               return $stmt->fetch($fetchMode);
+                return $this->stmt-> rowCount() > 0;
             }
         }
         catch (\PDOException $e) {
             echo $e->getMessage();
+            $this->close();
             //ErrorManager::redirectToErrorPage('db-error');
             return [];
         }
         catch (\Throwable $t) {
             echo $t->getMessage();
+            $this->close();
             //ErrorManager::redirectToErrorPage('unknown-error');
             return [];
         }
@@ -165,4 +178,10 @@ class QueryBuilder
     // SELECT fields FROM table WHERE condition
     // UPDATE table SET field=value WHERE condition
     // DELETE FROM table WHERE condition
+
+    public function close(): void
+    {
+        $this->stmt = null;
+        $this->conn = null;
+    }
 }

@@ -6,7 +6,7 @@ use Ramsey\Uuid\Uuid;
 
 class UserModel extends Model
 {
-    private const int PASS_LENGTH = 8;
+    private const PASS_LENGTH = 8;
 
     public function __construct(
         protected string $firstName,

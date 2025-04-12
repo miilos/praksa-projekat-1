@@ -164,41 +164,59 @@ class JobModel extends Model
 
     public static function updateJob(string $id, array $data): bool
     {
-        try {
-            $dbh = (new Db())->getConnection();
-
-            $query = "UPDATE jobs SET {{newValues}} WHERE jobId=:jobId";
-
-            $newValues = '';
-            foreach ($data as $key => $value) {
-                $newValues .= "$key=:$key, ";
-            }
-            $newValues = substr($newValues, 0, -2);
-
-            $query = str_replace("{{newValues}}", $newValues, $query);
-
-            $stmt = $dbh->prepare($query);
-            foreach ($data as $key => $value) {
-                if ($key === 'flexibleHours' || $key === 'workFromHome') {
-                    $value = ($value === 'on') ? 1 : 0;
-                }
-
-                $stmt->bindValue(":$key", $value);
-            }
-            $stmt->bindParam(':jobId', $id);
-
-            $stmt->execute();
-
-            return $stmt->rowCount() > 0;
+        if (isset($data['flexibleHours'])) {
+            $data['flexibleHours'] = ($data['flexibleHours'] === 'on') ? 1 : 0;
         }
-        catch (\PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
-            return false;
+
+        if (isset($data['workFromHome'])) {
+            $data['workFromHome'] = ($data['workFromHome'] === 'on') ? 1 : 0;
         }
-        catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
-            return false;
-        }
+
+        $qb = new QueryBuilder();
+        $qb->operation('UPDATE');
+        $qb->table('jobs');
+        $qb->values($data);
+        $qb->where(['jobId' => $id]);
+        $qb->build();
+        $status = $qb->execute();
+        $qb->close();
+        return $status;
+
+//        try {
+//            $dbh = (new Db())->getConnection();
+//
+//            $query = "UPDATE jobs SET {{newValues}} WHERE jobId=:jobId";
+//
+//            $newValues = '';
+//            foreach ($data as $key => $value) {
+//                $newValues .= "$key=:$key, ";
+//            }
+//            $newValues = substr($newValues, 0, -2);
+//
+//            $query = str_replace("{{newValues}}", $newValues, $query);
+//
+//            $stmt = $dbh->prepare($query);
+//            foreach ($data as $key => $value) {
+//                if ($key === 'flexibleHours' || $key === 'workFromHome') {
+//                    $value = ($value === 'on') ? 1 : 0;
+//                }
+//
+//                $stmt->bindValue(":$key", $value);
+//            }
+//            $stmt->bindParam(':jobId', $id);
+//
+//            $stmt->execute();
+//
+//            return $stmt->rowCount() > 0;
+//        }
+//        catch (\PDOException $e) {
+//            ErrorManager::redirectToErrorPage('db-error');
+//            return false;
+//        }
+//        catch (\Throwable $t) {
+//            ErrorManager::redirectToErrorPage('unknown-error');
+//            return false;
+//        }
     }
 
     public static function deleteJob(string $id): bool

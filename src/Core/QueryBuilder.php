@@ -68,7 +68,14 @@ class QueryBuilder
     {
         foreach ($data as $field => $value) {
             $this->bindings[] = [ $field => $value ];
-            $this->valuesString .= ":$field, ";
+
+            if ($this->operation === 'INSERT') {
+                $this->valuesString .= ":$field, ";
+            }
+
+            if ($this->operation === 'UPDATE') {
+                $this->valuesString .= "$field = :$field, ";
+            }
         }
         $this->valuesString = substr($this->valuesString, 0, -2);
     }
@@ -122,7 +129,13 @@ class QueryBuilder
 
     private function buildUpdate(): void
     {
+        $this->conditionsString = substr($this->conditionsString, 0, -4);
 
+        $this->query = "$this->operation $this->table SET $this->valuesString";
+
+        if ($this->conditionsString) {
+            $this->query .= " WHERE $this->conditionsString";
+        }
     }
 
     private function buildDelete(): void
@@ -157,7 +170,7 @@ class QueryBuilder
                 }
             }
             else {
-                return $this->stmt-> rowCount() > 0;
+                return $this->stmt->rowCount() > 0;
             }
         }
         catch (\PDOException $e) {

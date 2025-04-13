@@ -5,6 +5,9 @@ use App\Controllers\JobApplicationController;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
+$dotenv = Dotenv\Dotenv::createImmutable('../../');
+$dotenv->load();
+
 $user = SessionManager::getSessionData('user');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -12,7 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'userId' => $_POST['userId'],
             'jobId' =>  $_POST['jobId']
     ];
-    JobApplicationController::apply($data);
+
+    $emailData = [
+            'email' => $_POST['email'],
+            'name' => $_POST['firstName']
+    ];
+
+    JobApplicationController::apply($data, $emailData);
 }
 
 ?>
@@ -48,15 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="hidden" class="input" value="' . $_GET['jobId'] . '" name="jobId">
             
                     <div class="input-container">
-                        <input type="text" id="firstName" name="firstName" value="' . $user['firstName'] . '" class="input" disabled>
+                        <input type="text" id="firstName" name="firstName" value="' . $user['firstName'] . '" class="input" readonly>
                     </div>
             
                     <div class="input-container">
-                        <input type="text" id="lastName" name="lastName" value="' . $user['lastName'] . '" class="input" disabled>
+                        <input type="text" id="lastName" name="lastName" value="' . $user['lastName'] . '" class="input" readonly>
                     </div>
             
                     <div class="input-container">
-                        <input type="text" id="email" name="email" value="' . $user['email'] . '" class="input" disabled>
+                        <input type="text" id="email" name="email" value="' . $user['email'] . '" class="input" readonly>
                     </div>
             
                     <input type="submit" name="submit" class="form-btn" value="Prijavite se">

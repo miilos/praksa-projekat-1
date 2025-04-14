@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Managers\EmailManager;
 use App\Managers\ErrorManager;
 use App\Managers\SessionManager;
 use App\Models\UserModel;
@@ -22,6 +23,15 @@ class AuthController
         if($userModel->validate()) {
             $user = $userModel->createUser();
             SessionManager::startSession('user', $user);
+
+            $mailManager = new EmailManager();
+            $mailManager->sendMail(
+                $data['email'],
+                $data['firstName'],
+                'Dobrodosli!',
+                'Vas nalog je uspesno kreiran. Hvala sto koristite nasu platformu!'
+            );
+
             header('Location: ../Pages/home.php');
             return true;
         }

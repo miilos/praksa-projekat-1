@@ -6,6 +6,8 @@ use App\Pages\FormRenderer;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+Dotenv\Dotenv::createImmutable('../../')->load();
+
 $errors = [];
 
 // if the signup form was submitted, get the request body, validate it and create new user

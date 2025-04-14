@@ -4,7 +4,7 @@ namespace App\Pages;
 
 class JobRenderer
 {
-    public function renderJobs(string $title, array $jobs): string
+    public function renderJobs(string $title, array $jobs, array $favourites): string
     {
         $html = '
             <div class="jobs-container">
@@ -13,7 +13,7 @@ class JobRenderer
 
         if ($jobs) {
             foreach ($jobs as $job) {
-                $html .= $this->renderJob($job);
+                $html .= $this->renderJob($job, $favourites);
             }
         }
         else {
@@ -26,10 +26,12 @@ class JobRenderer
         return $html;
     }
 
-    private function renderJob(array $job): string
+    private function renderJob(array $job, array $favourites): string
     {
         $html = '
             <div class="job">
+                {{favourite}}
+            
                 <div class="job-general-info">
                     <h2 class="job-name">' . $job['jobName'] . '</h2>
     
@@ -68,6 +70,21 @@ class JobRenderer
             </div>
         ';
 
+        if ($this->isInFavourites($job['jobId'], $favourites)) {
+            $html = str_replace('{{favourite}}',
+            '
+                <div class="job-favourite">
+                    <span class="material-symbols-outlined">
+                        favorite
+                    </span>
+                </div>
+            ',
+            $html);
+        }
+        else {
+            $html = str_replace('{{favourite}}','', $html);
+        }
+
         if ($job['workFromHome']) {
             $html = str_replace('{{work-from-home}}',
                 '<div class="job-details-detail">
@@ -102,6 +119,17 @@ class JobRenderer
     private function formatStartingSalary(string $salary): string
     {
         return substr_replace($salary, '.', -3, 0);
+    }
+
+    private function isInFavourites(string $jobId, array $favourites): bool
+    {
+        foreach ($favourites as $favourite) {
+            if ($jobId === $favourite['jobId']) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function renderJobsAdminView(array $jobs, string $operation, string $btnLinkPage): string

@@ -3,6 +3,8 @@
 use App\Controllers\JobApplicationController;
 use App\Controllers\JobController;
 use App\Managers\SessionManager;
+use App\Controllers\FavouritesController;
+use App\Pages\JobRenderer;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -11,6 +13,8 @@ $user = SessionManager::getSessionData('user');
 if (!$user) {
     header('Location: ./login.php');
 }
+
+$favourites = FavouritesController::getUsersFavourites($user['userId']);
 
 ?>
 
@@ -32,9 +36,15 @@ if (!$user) {
 
     <?php
         $jobController = new JobController();
-        $jobController->getJobs("Oglasi za vas", [ 'field' => $user['field'] ]);
+        $jobController->getJobs("Oglasi za vas", [ 'field' => $user['field'] ], $favourites);
 
-        JobApplicationController::getApplicationsByUser($user['userId']);
+        $jobRenderer = new JobRenderer();
+
+        $jobsAppliedTo = JobApplicationController::getApplicationsByUser($user['userId']);
+        echo $jobRenderer->renderJobs('Vase prijave', $jobsAppliedTo, $favourites);
+
+        $favouriteJobs = FavouritesController::getFullUserFavouritesData($user['userId']);
+        echo $jobRenderer->renderJobs('Vasi omiljeni oglasi', $favouriteJobs, $favourites);
     ?>
 </body>
 </html>

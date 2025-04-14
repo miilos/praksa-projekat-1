@@ -4,13 +4,40 @@ use App\Managers\ErrorManager;
 use App\Managers\SessionManager;
 use App\Models\JobModel;
 use App\Models\JobApplicationModel;
+use App\Controllers\FavouritesController;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
+    // check if jobId exists in the url
+    if (!$_GET['id']) {
+        ErrorManager::redirectToErrorPage('bad-job-id');
+    }
     $job = JobModel::getJobById($_GET['id']);
 
+    // check if the user is logged in to know know whether to render a job application link or a login message
+    $user = SessionManager::getSessionData('user');
     if (!$job) {
         ErrorManager::redirectToErrorPage('bad-job-id');
+    }
+
+    // check if the user already added this job to his favourites
+    $isFavourite = false;
+    if ($user) {
+        $favourites = FavouritesController::getUsersFavourites($user['userId']);
+
+        foreach ($favourites as $favourite) {
+            if ($favourite['jobId'] === $job['jobId']) {
+                $isFavourite = true;
+            }
+        }
+    }
+
+    // if the heart button was clicked, add this job to the user's favourites
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        FavouritesController::addFavourite([
+                'userId' => $user['userId'],
+                'jobId' => $job['jobId']
+        ]);
     }
 ?>
 
@@ -29,6 +56,16 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     <?php include_once '../Pages/_navbar.php' ?>
 
     <div class="job-header">
+        <?php if ($user): ?>
+        <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . $job['jobId'] ?>" method="post" class="favourites-form">
+            <button type="submit" class="favourites-btn">
+                <span class="material-symbols-outlined">
+                <?= $isFavourite ? 'favorite' : 'heart_plus' ?>
+                </span>
+            </button>
+        </form>
+        <?php endif; ?>
+
         <h1 class="job-header-title"><?php echo $job['jobName'] ?></h1>
         <h3 class="job-header-employer"><?php echo $job['employerName'] ?></h3>
         <div class="job-header-info">
@@ -96,7 +133,6 @@ require_once __DIR__ . '../../../vendor/autoload.php';
 
     <div class="job-application">
         <?php
-            $user = SessionManager::getSessionData('user');
             $applied = false;
 
             if ($user) {

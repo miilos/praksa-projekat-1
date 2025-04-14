@@ -8,7 +8,7 @@ use App\Pages\JobRenderer;
 
 class JobController
 {
-    public function getJobs(string $title, array $filter = []): void
+    public function getJobs(string $title, array $filter = [], array $favourites = []): void
     {
         $jobs = [];
 
@@ -20,17 +20,17 @@ class JobController
         }
 
         $jobRenderer = new JobRenderer();
-        $html = $jobRenderer->renderJobs($title, $jobs);
+        $html = $jobRenderer->renderJobs($title, $jobs, $favourites);
 
         echo $html;
     }
 
-    public function getFilteredJobs(string $title, array $filter): void
+    public function getFilteredJobs(string $title, array $filter, array $favourites = []): void
     {
         $jobs = JobModel::filterJobs($filter);
 
         $jobRenderer = new JobRenderer();
-        $html = $jobRenderer->renderJobs($title, $jobs);
+        $html = $jobRenderer->renderJobs($title, $jobs, $favourites);
 
         echo $html;
     }

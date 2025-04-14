@@ -2,8 +2,17 @@
 
 use App\Controllers\JobController;
 use App\Core\Request;
+use App\Managers\SessionManager;
+use App\Controllers\FavouritesController;
 
 require_once __DIR__ . '/vendor/autoload.php';
+
+$user = SessionManager::getSessionData('user');
+
+$favourites = [];
+if ($user) {
+    $favourites = FavouritesController::getUsersFavourites($user['userId']);
+}
 
 ?>
 
@@ -26,16 +35,16 @@ require_once __DIR__ . '/vendor/autoload.php';
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']) ?>" class="form search" autocomplete="off">
         <h1 class="search-title">Filteri za pretragu</h1>
 
-        <input type="text" id="jobName" name="jobName" class="input" placeholder="Naziv oglasa">
-        <input type="text" id="location" name="location" class="input" placeholder="Lokacija">
+        <input type="text" id="jobName" name="jobName" class="input" placeholder="Naziv oglasa" value="<?php echo ($_POST['jobName'] ?? '') ?>" >
+        <input type="text" id="location" name="location" class="input" placeholder="Lokacija" value="<?php echo ($_POST['location'] ?? '') ?>">
 
-        <input type="checkbox" id="flexibleHours" name="flexibleHours">
+        <input type="checkbox" id="flexibleHours" name="flexibleHours" <?php echo (isset($_POST['flexibleHours']) ? 'checked' : '') ?>>
         <label for="flexibleHours">Klizno radno vreme</label>
 
-        <input type="checkbox" id="workFromHome" name="workFromHome">
+        <input type="checkbox" id="workFromHome" name="workFromHome" <?php echo (isset($_POST['workFromHome']) ? 'checked' : '') ?>>
         <label for="workFromHome">Rad od kuce</label>
 
-        <input type="submit" id="submit" name="submit" class="form-btn" value="Primeni filtere">
+        <input type="submit" id="submit" name="submit-filters" class="form-btn" value="Primeni filtere">
     </form>
 
     <?php
@@ -46,10 +55,10 @@ require_once __DIR__ . '/vendor/autoload.php';
             $body = $request->getBody();
             unset($body['submit']);
 
-            $jobController->getFilteredJobs('Filtrirani oglasi', $body);
+            $jobController->getFilteredJobs('Filtrirani oglasi', $body, $favourites);
         }
         else {
-            $jobController->getJobs('Svi oglasi');
+            $jobController->getJobs('Svi oglasi', favourites: $favourites);
         }
     ?>
 </body>

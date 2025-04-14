@@ -30,13 +30,8 @@ class JobApplicationController
         }
     }
 
-    public static function getApplicationsByUser($userId): void
+    public static function getApplicationsByUser($userId): array
     {
-        $jobsAppliedTo = JobApplicationModel::getJobsAppliedToByUser($userId);
-
-        if($jobsAppliedTo) {
-            $jobRenderer = new JobRenderer();
-            echo $jobRenderer->renderJobs('Vase prijave', $jobsAppliedTo);
-        }
+        return JobApplicationModel::getJobsAppliedToByUser($userId);
     }
 }

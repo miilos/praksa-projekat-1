@@ -12,6 +12,7 @@ $user = SessionManager::getSessionData('user');
 
 if (!$user) {
     header('Location: ./login.php');
+    exit();
 }
 
 $favourites = FavouritesController::getUsersFavourites($user['userId']);

@@ -14,11 +14,8 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     }
     $job = JobModel::getJobById($_GET['id']);
 
-    // check if the user is logged in to know know whether to render a job application link or a login message
+    // check if the user is logged in to know whether to render a job application link or a login message
     $user = SessionManager::getSessionData('user');
-    if (!$job) {
-        ErrorManager::redirectToErrorPage('bad-job-id');
-    }
 
     // check if the user already added this job to his favourites
     $isFavourite = false;
@@ -30,14 +27,6 @@ require_once __DIR__ . '../../../vendor/autoload.php';
                 $isFavourite = true;
             }
         }
-    }
-
-    // if the heart button was clicked, add this job to the user's favourites
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        FavouritesController::addFavourite([
-                'userId' => $user['userId'],
-                'jobId' => $job['jobId']
-        ]);
     }
 ?>
 
@@ -57,40 +46,38 @@ require_once __DIR__ . '../../../vendor/autoload.php';
 
     <div class="job-header">
         <?php if ($user): ?>
-        <form action="<?= htmlspecialchars($_SERVER['PHP_SELF']) . '?id=' . $job['jobId'] ?>" method="post" class="favourites-form">
-            <button type="submit" class="favourites-btn">
+            <button class="favourites-btn" data-user="<?= $user['userId'] ?>" data-job="<?= $job['jobId'] ?>">
                 <span class="material-symbols-outlined">
-                <?= $isFavourite ? 'favorite' : 'heart_plus' ?>
+                    <?= $isFavourite ? 'favorite' : 'heart_plus' ?>
                 </span>
             </button>
-        </form>
         <?php endif; ?>
 
-        <h1 class="job-header-title"><?php echo $job['jobName'] ?></h1>
-        <h3 class="job-header-employer"><?php echo $job['employerName'] ?></h3>
+        <h1 class="job-header-title"><?= $job['jobName'] ?></h1>
+        <h3 class="job-header-employer"><?= $job['employerName'] ?></h3>
         <div class="job-header-info">
             <div>
                 <span class="material-symbols-outlined">
                     location_on
                 </span>
-                <?php echo $job['location'] ?>
+                <?= $job['location'] ?>
             </div>
             <div>
                 <span class="material-symbols-outlined">
                     schedule
                 </span>
-                <?php echo date('j.n.Y.', strtotime($job['createdAt'])) ?>
+                <?= date('j.n.Y.', strtotime($job['createdAt'])) ?>
             </div>
             <div>
                 <span class="material-symbols-outlined">
                     update
                 </span>
-                <?php echo $job['shifts'] === 1 ? $job['shifts'] . ' smena' : $job['shifts'] . ' smene' ?>
+                <?= $job['shifts'] === 1 ? $job['shifts'] . ' smena' : $job['shifts'] . ' smene' ?>
             </div>
         </div>
         <div class="job-header-extra-info">
             <div class="job-details-detail job-details-detail--field">
-                <?php echo $job['field'] ?>
+                <?= $job['field'] ?>
             </div>
             <?php
                 if ($job['workFromHome']) {
@@ -121,13 +108,18 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     <div class="job-info">
         <div class="job-description">
             <h1 class="job-description-title">Opis posla:</h1>
-            <p class="job-description-desc"><?php echo $job['description'] ?></p>
+            <p class="job-description-desc"><?= $job['description'] ?></p>
         </div>
 
         <div class="employer-info">
             <h1 class="employer-info-title">O poslodavcu:</h1>
-            <p class="employer-info-desc"><?php echo $job['employerDescription'] ?></p>
-            <p class="employer-info-based-in"><b>Baziran u: </b><?php echo $job['basedIn'] ?></p>
+            <p class="employer-info-desc"><?= $job['employerDescription'] ?></p>
+            <p class="employer-info-based-in"><b>Baziran u: </b><?= $job['basedIn'] ?></p>
+        </div>
+
+        <div class="job-comments">
+            <h1 class="job-comments-title">Komentari:</h1>
+            <a href="./createComment.php?jobId=<?= $job['jobId'] ?>" class="btn btn--primary">Ostavite komentar</a>
         </div>
     </div>
 
@@ -158,5 +150,7 @@ require_once __DIR__ . '../../../vendor/autoload.php';
             }
         ?>
     </div>
+
+    <script src="./scripts/addFavourites.js"></script>
 </body>
 </html>

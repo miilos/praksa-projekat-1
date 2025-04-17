@@ -123,7 +123,7 @@ class JobModel extends Model
             $this->errors['description'][] = 'Morate unesti opis oglasa';
         }
 
-        if (!$this->field) {
+        if ($this->field === '-') {
             $this->errors['field'][] = 'Morate izabrati polje rada';
         }
 
@@ -131,8 +131,8 @@ class JobModel extends Model
             $this->errors['startSalary'][] = 'Morate uneti pocetnu platu';
         }
 
-        if (!$this->location) {
-            $this->errors['location'][] = 'Morate uneti lokaciju posla';
+        if ($this->location === '-') {
+            $this->errors['location'][] = 'Morate izabrati lokaciju posla';
         }
 
         return empty($this->errors);

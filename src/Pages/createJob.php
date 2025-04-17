@@ -1,11 +1,13 @@
 <?php
 
-    use App\Controllers\JobController;
+    use App\Core\Request;
     use App\Managers\SessionManager;
     use App\Managers\ErrorManager;
     use App\Pages\FormRenderer;
     use App\Controllers\EmployerController;
-    use App\Core\Request;
+    use App\Controllers\JobController;
+    use App\Controllers\LocationController;
+    use App\Controllers\FieldOfWorkController;
 
     require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -60,7 +62,14 @@
             ', $errors['employerId'] ?? null);
             echo FormRenderer::renderFormField('<input type="text" id="jobName" name="jobName" placeholder="Naziv oglasa" class="input">', $errors['jobName'] ?? null);
             echo FormRenderer::renderFormField('<textarea id="description" name="description" placeholder="Opis oglasa" class="input"></textarea>', $errors['description'] ?? null);
-            echo FormRenderer::renderFormField('<input type="text" id="field" name="field" placeholder="Polje rada" class="input">', $errors['field'] ?? null);
+
+            $fields = FieldOfWorkController::getAllFields();
+            $fieldsHtml = '<option value="-">Izaberite polje rada</option>';
+            foreach ($fields as $field) {
+                $fieldsHtml .= '<option value="' . $field . '">' . ucfirst($field) . '</option>';
+            }
+
+            echo FormRenderer::renderFormField('<select name="field" class="input">' . $fieldsHtml . '</select>', $errors['field'] ?? null);
             echo FormRenderer::renderFormField('<input type="number" id="startSalary" name="startSalary" placeholder="Pocetna plata" class="input">', $errors['startSalary'] ?? null);
             echo FormRenderer::renderFormField('
                 <select name="shifts" class="input">
@@ -69,7 +78,14 @@
                     <option value="3">3</option>
                 </select>
             ', $errors['shifts'] ?? null);
-            echo FormRenderer::renderFormField('<input type="text" id="location" name="location" placeholder="Lokacija" class="input">', $errors['location'] ?? null);
+
+            $locations = LocationController::getAllLocations();
+            $locationsHtml = '<option value="-">Izaberite grad</option>';
+            foreach ($locations as $location) {
+                $locationsHtml .= '<option value="' . $location . '">' . $location . '</option>';
+            }
+
+            echo FormRenderer::renderFormField('<select class="input" name="location">' . $locationsHtml . '</select>', $errors['location'] ?? null);
             echo FormRenderer::renderFormField('
                 <input type="checkbox" id="flexibleHours" name="flexibleHours">
                 <label for="flexibleHours">Klizno radno vreme</label>    

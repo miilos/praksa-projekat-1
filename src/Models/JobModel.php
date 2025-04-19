@@ -25,8 +25,7 @@ class JobModel extends Model
     public static function getJobs(array $filter = []): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('*');
+        $qb->select('*');
         $qb->table('jobs');
         $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
 
@@ -36,17 +35,13 @@ class JobModel extends Model
             }
         }
 
-        $qb->build();
-        $jobs = $qb->execute();
-        $qb->close();
-        return $jobs;
+        return $qb->execute();
     }
 
     public static function filterJobs(array $filters): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('*');
+        $qb->select('*');
         $qb->table('jobs');
         $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
 
@@ -70,10 +65,7 @@ class JobModel extends Model
             }
         }
 
-        $qb->build();
-        $jobs = $qb->execute();
-        $qb->close();
-        return $jobs;
+        return $qb->execute();
     }
 
     private static function checkFiltersEmpty(array $filters): bool
@@ -84,27 +76,19 @@ class JobModel extends Model
     public static function getJobById(string $id): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('*');
+        $qb->select('*');
         $qb->table('jobs');
         $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
         $qb->where(['jobId' => $id]);
-        $qb->build();
-        $job = $qb->execute('one');
-        $qb->close();
-        return $job;
+        return $qb->execute('one');
     }
 
     public static function getJobNames(): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('jobId', 'jobName');
+        $qb->select('jobId', 'jobName');
         $qb->table('jobs');
-        $qb->build();
-        $jobs = $qb->execute();
-        $qb->close();
-        return $jobs;
+        return $qb->execute();
     }
 
     public function validate(): bool
@@ -140,7 +124,7 @@ class JobModel extends Model
     {
         $jobId = Uuid::uuid4();
         $qb = new QueryBuilder();
-        $qb->operation('INSERT');
+        $qb->insert();
         $qb->table('jobs');
         $qb->fields('jobId', 'employerId', 'jobName', 'description', 'field', 'startSalary', 'shifts', 'location', 'flexibleHours', 'workFromHome');
         $qb->values([
@@ -155,9 +139,7 @@ class JobModel extends Model
             'flexibleHours' => isset($this->flexibleHours) ? 1 : 0,
             'workFromHome' => isset($this->workFromHome) ? 1 : 0
         ]);
-        $qb->build();
         $qb->execute();
-        $qb->close();
     }
 
     public static function updateJob(string $id, array $data): bool
@@ -171,14 +153,11 @@ class JobModel extends Model
         }
 
         $qb = new QueryBuilder();
-        $qb->operation('UPDATE');
+        $qb->update();
         $qb->table('jobs');
         $qb->values($data);
         $qb->where(['jobId' => $id]);
-        $qb->build();
-        $status = $qb->execute();
-        $qb->close();
-        return $status;
+        return $qb->execute();
     }
 
     public static function deleteJob(string $id): bool
@@ -187,12 +166,9 @@ class JobModel extends Model
         FavouritesModel::deleteJobFromFavourites($id);
 
         $qb = new QueryBuilder();
-        $qb->operation("DELETE");
+        $qb->delete();
         $qb->table('jobs');
         $qb->where(['jobId' => $id]);
-        $qb->build();
-        $status = $qb->execute();
-        $qb->close();
-        return $status;
+        return $qb->execute();
     }
 }

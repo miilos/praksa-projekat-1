@@ -61,13 +61,9 @@ class UserModel extends Model
     private function getEmailsInDB(): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('email');
+        $qb->select('email');
         $qb->table('users');
-        $qb->build();
-        $emails = $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
-        $qb->close();
-        return $emails;
+        return $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
     }
 
     public function createUser(): array
@@ -76,7 +72,7 @@ class UserModel extends Model
         $this->password = password_hash($this->password, PASSWORD_BCRYPT);
 
         $qb = new QueryBuilder();
-        $qb->operation('INSERT');
+        $qb->insert();
         $qb->table('users');
         $qb->fields('userId', 'firstName', 'lastName', 'email', 'password', 'field');
         $qb->values([
@@ -87,9 +83,7 @@ class UserModel extends Model
             'password' => $this->password,
             'field' => $this->field
         ]);
-        $qb->build();
         $qb->execute();
-        $qb->close();
 
         // builds an array that looks like what fetching the new user from the database would look like,
         // so that there's no need for another query to add user data to the session variable
@@ -109,13 +103,9 @@ class UserModel extends Model
     public static function getUserByEmail(string $email): array|bool
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('*');
+        $qb->select('*');
         $qb->table('users');
         $qb->where(['email' => $email]);
-        $qb->build();
-        $user = $qb->execute('one');
-        $qb->close();
-        return $user;
+        return $qb->execute('one');
     }
 }

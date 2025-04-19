@@ -14,7 +14,7 @@ class JobApplicationModel
     {
         $applicationId = Uuid::uuid4();
         $qb = new QueryBuilder();
-        $qb->operation('INSERT');
+        $qb->insert();
         $qb->table('applications');
         $qb->fields('applicationId', 'userId', 'jobId');
         $qb->values([
@@ -22,40 +22,22 @@ class JobApplicationModel
             'userId' => $data['userId'],
             'jobId' => $data['jobId']
         ]);
-        $qb->build();
-        $status = $qb->execute();
-        $qb->close();
-        return $status;
+        return $qb->execute();
     }
 
     public static function getJobsAppliedToByUser(string $userId, bool $onlyIds = false): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
 
         if ($onlyIds) {
-            $qb->fields(
-                [ 'field' => 'jobId', 'table' => 'jobs' ],
-                [ 'field' => 'submittedAt', 'table' => 'applications' ]
-            );
+            $qb->select('j.jobId', 'a.submittedAt');
             $qb->table('applications');
             $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
         }
         else {
-            $qb->fields(
-                ['field' => 'jobId', 'table' => 'jobs'],
-                ['field' => 'employerId', 'table' => 'jobs'],
-                ['field' => 'jobName', 'table' => 'jobs'],
-                ['field' => 'description', 'table' => 'jobs'],
-                ['field' => 'field', 'table' => 'jobs'],
-                ['field' => 'startSalary', 'table' => 'jobs'],
-                ['field' => 'location', 'table' => 'jobs'],
-                ['field' => 'createdAt', 'table' => 'jobs'],
-                ['field' => 'flexibleHours', 'table' => 'jobs'],
-                ['field' => 'workFromHome', 'table' => 'jobs'],
-                ['field' => 'submittedAt', 'table' => 'applications'],
-                ['field' => 'userId', 'table' => 'applications'],
-                ['field' => 'employerName', 'table' => 'employers']
+            $qb->select(
+                'j.jobId', 'j.employerId', 'j.jobName', 'j.description', 'j.field', 'j.startSalary',
+                'j.location', 'j.createdAt', 'j.flexibleHours' ,'j.workFromHome', 'a.submittedAt', 'a.userId', 'e.employerName'
             );
             $qb->table('applications');
             $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
@@ -63,9 +45,6 @@ class JobApplicationModel
         }
 
         $qb->where([ 'userId' => $userId ], table: 'applications');
-        $qb->build();
-        $applications = $qb->execute();
-        $qb->close();
-        return $applications;
+        return $qb->execute();
     }
 }

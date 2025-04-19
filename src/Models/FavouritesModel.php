@@ -11,7 +11,7 @@ class FavouritesModel
     {
         $favouriteId = Uuid::uuid4();
         $qb = new QueryBuilder();
-        $qb->operation('INSERT');
+        $qb->insert();
         $qb->table('favourites');
         $qb->fields('favouriteId', 'userId', 'jobId');
         $qb->values([
@@ -19,73 +19,52 @@ class FavouritesModel
             'userId' => $data['userId'],
             'jobId' => $data['jobId']
         ]);
-        $qb->build();
-        $status = $qb->execute();
-        $qb->close();
-        return $status;
+        return $qb->execute();
     }
 
     public static function getAllFavourites(): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('*');
+        $qb->select('*');
         $qb->table('favourites');
-        $qb->build();
-        $favourites = $qb->execute();
-        $qb->close();
-        return $favourites;
+        return $qb->execute();
     }
 
     public static function getUsersFavourites(string $userId): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('jobId');
+        $qb->select('jobId');
         $qb->table('favourites');
         $qb->where(['userId' => $userId]);
-        $qb->build();
-        $favourites = $qb->execute();
-        $qb->close();
-        return $favourites;
+        return $qb->execute();
     }
 
     public static function getFullUserFavouritesData(string $userId): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('*');
+        $qb->select('*');
         $qb->table('favourites');
         $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
         $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
         $qb->where(['userId' => $userId]);
-        $qb->build();
-        $favourites = $qb->execute();
-        $qb->close();
-        return $favourites;
+        return $qb->execute();
     }
 
     public static function removeFavourite(string $favouriteId): bool
     {
         $qb = new QueryBuilder();
-        $qb->operation('DELETE');
+        $qb->delete();
         $qb->table('favourites');
         $qb->where(['favouriteId' => $favouriteId]);
-        $qb->build();
-        $status = $qb->execute();
-        $qb->close();
-        return $status;
+        return $qb->execute();
     }
 
     public static function deleteJobFromFavourites(string $jobId): bool
     {
         $qb = new QueryBuilder();
-        $qb->operation('DELETE');
+        $qb->delete();
         $qb->table('favourites');
         $qb->where(['jobId' => $jobId]);
-        $qb->build();
-        $status = $qb->execute();
-        $qb->close();
-        return $status;
+        return $qb->execute();
     }
 }

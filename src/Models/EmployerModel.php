@@ -9,12 +9,8 @@ class EmployerModel
     public static function getAllEmployers(): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('employerId', 'employerName');
+        $qb->select('employerId, employerName');
         $qb->table('employers');
-        $qb->build();
-        $employers = $qb->execute();
-        $qb->close();
-        return $employers;
+        return $qb->execute();
     }
 }

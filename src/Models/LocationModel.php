@@ -9,12 +9,8 @@ class LocationModel
     public static function getAllLocations(): array
     {
         $qb = new QueryBuilder();
-        $qb->operation('SELECT');
-        $qb->fields('city');
+        $qb->select('city');
         $qb->table('locations');
-        $qb->build();
-        $locations = $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
-        $qb->close();
-        return $locations;
+        return $qb->execute(fetchMode: \PDO::FETCH_COLUMN);
     }
 }

@@ -22,6 +22,29 @@ class QueryBuilder
         $this->operation = $operation;
     }
 
+    public function select(mixed ...$fields): void
+    {
+        $this->operation = 'SELECT';
+        // $fields need to be destructured because $this->fields() is a variadic function
+        // so it will wrap the array inside another array
+        $this->fields(...$fields);
+    }
+
+    public function insert(): void
+    {
+        $this->operation = 'INSERT';
+    }
+
+    public function update(): void
+    {
+        $this->operation = 'UPDATE';
+    }
+
+    public function delete(): void
+    {
+        $this->operation = 'DELETE';
+    }
+
     public function table(string $table): void
     {
         $this->table = $table;
@@ -90,7 +113,7 @@ class QueryBuilder
         }
     }
 
-    public function build(): void
+    private function build(): void
     {
         switch ($this->operation) {
             case 'SELECT':
@@ -146,6 +169,8 @@ class QueryBuilder
 
     public function execute(string $fetch = 'all', int $fetchMode = \PDO::FETCH_ASSOC): array|bool
     {
+        $this->build();
+
         try {
             $this->conn = (new Db())->getConnection();
 
@@ -159,20 +184,25 @@ class QueryBuilder
 
             $this->stmt->execute();
 
+            $results = null;
             if ($this->operation === 'SELECT') {
+                if ($fetchMode === \PDO::FETCH_COLUMN) {
+                    $results = $this->stmt->fetchAll($fetchMode, 0);
+                }
+
                 if ($fetch === 'all') {
-                    if ($fetchMode === \PDO::FETCH_COLUMN) {
-                        return $this->stmt->fetchAll($fetchMode, 0);
-                    }
-                    return $this->stmt->fetchAll($fetchMode);
+                    $results = $this->stmt->fetchAll($fetchMode);
                 }
                 else {
-                    return $this->stmt->fetch($fetchMode);
+                    $results = $this->stmt->fetch($fetchMode);
                 }
             }
             else {
-                return $this->stmt->rowCount() > 0;
+                $results = $this->stmt->rowCount() > 0;
             }
+
+            $this->close();
+            return $results;
         }
         catch (\PDOException $e) {
             echo $e->getMessage();
@@ -188,7 +218,7 @@ class QueryBuilder
         }
     }
 
-    public function close(): void
+    private function close(): void
     {
         $this->stmt = null;
         $this->conn = null;

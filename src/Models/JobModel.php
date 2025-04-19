@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use App\Core\Db;
-use App\Managers\ErrorManager;
-use App\Managers\SuccessManager;
 use Ramsey\Uuid\Uuid;
 use App\Core\QueryBuilder;
+use App\Models\FavouritesModel;
 
 class JobModel extends Model
 {
@@ -154,8 +152,8 @@ class JobModel extends Model
             'startSalary' => $this->startSalary,
             'shifts' => $this->shifts,
             'location' => $this->location,
-            'flexibleHours' => $this->flexibleHours,
-            'workFromHome' => $this->workFromHome
+            'flexibleHours' => isset($this->flexibleHours) ? 1 : 0,
+            'workFromHome' => isset($this->workFromHome) ? 1 : 0
         ]);
         $qb->build();
         $qb->execute();
@@ -185,6 +183,9 @@ class JobModel extends Model
 
     public static function deleteJob(string $id): bool
     {
+        // delete any entries in the favourites table because jobId is a foreign key there
+        FavouritesModel::deleteJobFromFavourites($id);
+
         $qb = new QueryBuilder();
         $qb->operation("DELETE");
         $qb->table('jobs');

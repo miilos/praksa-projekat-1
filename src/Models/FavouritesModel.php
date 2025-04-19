@@ -76,4 +76,16 @@ class FavouritesModel
         $qb->close();
         return $status;
     }
+
+    public static function deleteJobFromFavourites(string $jobId): bool
+    {
+        $qb = new QueryBuilder();
+        $qb->operation('DELETE');
+        $qb->table('favourites');
+        $qb->where(['jobId' => $jobId]);
+        $qb->build();
+        $status = $qb->execute();
+        $qb->close();
+        return $status;
+    }
 }

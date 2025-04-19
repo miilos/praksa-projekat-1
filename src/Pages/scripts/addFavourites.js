@@ -4,7 +4,7 @@ favouritesBtn.addEventListener('click', async (e) => {
     const userId = favouritesBtn.dataset.user
     const jobId = favouritesBtn.dataset.job
 
-    await fetch('http://localhost:8080/praksa-projekat-1/src/Pages/favouritesEndpoints.php', {
+    await fetch('http://localhost/praksa-projekat-1/src/Pages/favouritesEndpoints.php', {
         method: 'POST',
         body: JSON.stringify({
             userId: userId,

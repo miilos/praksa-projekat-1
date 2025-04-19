@@ -55,8 +55,8 @@ class JobController
             (int)$data['startSalary'],
             $data['shifts'],
             $data['location'],
-            isset($data['flexibleHours']) ? true : false,
-            isset($data['workFromHome']) ? true : false
+            isset($data['flexibleHours']),
+            isset($data['workFromHome'])
         );
 
         if ($jobModel->validate()) {

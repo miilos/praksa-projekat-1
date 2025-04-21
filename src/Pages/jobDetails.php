@@ -5,6 +5,7 @@ use App\Managers\SessionManager;
 use App\Models\JobModel;
 use App\Models\JobApplicationModel;
 use App\Controllers\FavouritesController;
+use App\Controllers\CommentController;
 
 require_once __DIR__ . '../../../vendor/autoload.php';
 
@@ -116,11 +117,43 @@ require_once __DIR__ . '../../../vendor/autoload.php';
             <p class="employer-info-desc"><?= $job['employerDescription'] ?></p>
             <p class="employer-info-based-in"><b>Baziran u: </b><?= $job['basedIn'] ?></p>
         </div>
+    </div>
 
-        <div class="job-comments">
-            <h1 class="job-comments-title">Komentari:</h1>
-            <a href="./createComment.php?jobId=<?= $job['jobId'] ?>" class="btn btn--primary">Ostavite komentar</a>
+    <div class="job-comments">
+        <h1 class="job-comments-title">Komentari:</h1>
+
+        <div class="comments">
+            <?php
+                $comments = CommentController::getCommentsForJob($job['jobId']);
+
+                if (!$comments) {
+                    echo '<h3 class="no-comments">Jos nema komentara za ovaj oglas</h3>';
+                }
+                else {
+                    foreach ($comments as $comment) {
+                        echo '
+                            <div class="comment">
+                                <div class="comment-header">
+                                    <h3 class="comment-user">' . $comment['firstName'] . '</h3>
+                                    <span class="comment-header--gray">&bull;</span>
+                                    <p class="comment-created-at comment-header--gray">' . date('j.n.Y.', strtotime($comment['createdAt'])) . '</p>
+                                </div>
+                                <p class="comment-text">' . $comment['text'] . '</p>
+                            </div>
+                        ';
+                    }
+                }
+            ?>
         </div>
+
+        <?php
+            if ($user) {
+                echo '
+                    <textarea class="input comment-input" rows="10" placeholder="Ostavite komentar"></textarea>
+                    <button class="btn btn--primary comment-btn" data-username="' . $user['firstName'] . '" data-user="' . $user['userId'] . '" data-job="' . $job['jobId'] . '">Postavi</button>
+                ';
+            }
+        ?>
     </div>
 
     <div class="job-application">
@@ -152,5 +185,6 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     </div>
 
     <script src="./scripts/addFavourites.js"></script>
+    <script src="./scripts/addComment.js"></script>
 </body>
 </html>

@@ -25,4 +25,13 @@ class CommentModel
         $qb->where(['job_id' => $jobId]);
         return $qb->execute();
     }
+
+    public static function deleteCommentsForJob(string $jobId): bool
+    {
+        $qb = new QueryBuilder();
+        $qb->delete();
+        $qb->table('comments');
+        $qb->where(['job_id' => $jobId]);
+        return $qb->execute();
+    }
 }

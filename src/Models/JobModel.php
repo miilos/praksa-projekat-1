@@ -162,8 +162,9 @@ class JobModel extends Model
 
     public static function deleteJob(string $id): bool
     {
-        // delete any entries in the favourites table because jobId is a foreign key there
+        // delete any entries in the favourites and comments tables because jobId is a foreign key there
         FavouritesModel::deleteJobFromFavourites($id);
+        CommentModel::deleteCommentsForJob($id);
 
         $qb = new QueryBuilder();
         $qb->delete();

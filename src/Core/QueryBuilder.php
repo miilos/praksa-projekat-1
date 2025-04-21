@@ -189,8 +189,7 @@ class QueryBuilder
                 if ($fetchMode === \PDO::FETCH_COLUMN) {
                     $results = $this->stmt->fetchAll($fetchMode, 0);
                 }
-
-                if ($fetch === 'all') {
+                else if ($fetch === 'all') {
                     $results = $this->stmt->fetchAll($fetchMode);
                 }
                 else {

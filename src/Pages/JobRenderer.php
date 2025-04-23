@@ -65,7 +65,7 @@ class JobRenderer
                 </div>
     
                 <div class="job-apply-btn">
-                    <a href="/praksa-projekat-1/src/Pages/jobDetails.php?id=' . $job['jobId'] . '" class="btn btn--primary">Vidi jos</a>
+                    <a href="/src/Pages/jobDetails.php?id=' . $job['jobId'] . '" class="btn btn--primary">Vidi jos</a>
                 </div>
             </div>
         ';
@@ -157,7 +157,7 @@ class JobRenderer
         $html = '
             <div class="job-admin">
                 <h2 class="job-admin-name">' . $job['jobName'] . '</h2>
-                <a class="btn btn--primary" href="/praksa-projekat-1/src/Pages/' . $btnLinkPage . '?id=' . $job['jobId'] . '">' . $operation . '</a>
+                <a class="btn btn--primary" href="/src/Pages/' . $btnLinkPage . '?id=' . $job['jobId'] . '">' . $operation . '</a>
             </div>
         ';
 

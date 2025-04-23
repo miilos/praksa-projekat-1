@@ -8,9 +8,9 @@ use PDOException;
 
 class Db
 {
-    private string $host = "localhost";
-    private string $user = "root";
-    private string $pass = "";
+    private string $host = "db";
+    private string $user = "milos";
+    private string $pass = "milospassword123@!";
     private string $database = "praksa-projekat-1";
 
     private $dbh;
@@ -27,7 +27,8 @@ class Db
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $e) {
-            ErrorManager::redirectToErrorPage('db-error');
+            var_dump($e->getMessage());
+            //ErrorManager::redirectToErrorPage('db-error');
         }
         catch (\Throwable $t) {
             ErrorManager::redirectToErrorPage('unknown-error');

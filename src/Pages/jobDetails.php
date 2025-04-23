@@ -159,6 +159,7 @@ require_once __DIR__ . '../../../vendor/autoload.php';
     <div class="job-application">
         <?php
             $applied = false;
+            $appliedAt = '';
 
             if ($user) {
                 $jobsAppliedTo = JobApplicationModel::getJobsAppliedToByUser($user['userId'], true);
@@ -166,19 +167,20 @@ require_once __DIR__ . '../../../vendor/autoload.php';
                 foreach ($jobsAppliedTo as $jobApplied) {
                     if ($jobApplied['jobId'] === $job['jobId']) {
                         $applied = true;
+                        $appliedAt = $jobApplied['submittedAt'];
                     }
                 }
             }
 
             if ($applied) {
                 echo '
-                    <h1 class="job-application-title">Prijavili ste se na ovaj oglas ' . date('j.n.Y.', strtotime($jobApplied['submittedAt'])) . '</h1>
+                    <h1 class="job-application-title">Prijavili ste se na ovaj oglas ' . date('j.n.Y.', strtotime($appliedAt)) . '</h1>
                 ';
             }
             else {
                 echo '
                     <h1 class="job-application-title">Prijavi se!</h1>
-                    <a href="/praksa-projekat-1/src/Pages/jobApplication.php?jobId=' . $job['jobId'] . '" class="btn btn--secondary">Posalji prijavu</a>
+                    <a href="/src/Pages/jobApplication.php?jobId=' . $job['jobId'] . '" class="btn btn--secondary">Posalji prijavu</a>
                 ';
             }
         ?>

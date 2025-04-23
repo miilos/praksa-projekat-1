@@ -8,7 +8,7 @@ postBtn.addEventListener('click', async () => {
     const jobId = postBtn.dataset.job
     const comment = commentTextArea.value
 
-    const res = await fetch('http://localhost:8080/praksa-projekat-1/src/Pages/postComment.php', {
+    const res = await fetch('http://localhost:8000/src/Pages/postComment.php', {
         method: 'POST',
         body: JSON.stringify({
             user_id: userId,

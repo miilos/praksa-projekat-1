@@ -22,7 +22,7 @@
 
     <h1 class="success-title"><?= $header ?></h1>
     <p><?= $text ?></p>
-    <a href="/praksa-projekat-1/index.php" class="btn btn--primary">Nazad na home</a>
+    <a href="/index.php" class="btn btn--primary">Nazad na home</a>
 </div>
 </body>
 </html>

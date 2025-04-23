@@ -6,7 +6,7 @@ class SuccessManager
 {
     public static function redirectToSuccessPage($msg): void
     {
-        header('Location: /praksa-projekat-1/src/Pages/success.php?msg=' . $msg);
+        header('Location: /src/Pages/success.php?msg=' . $msg);
         exit();
     }
 

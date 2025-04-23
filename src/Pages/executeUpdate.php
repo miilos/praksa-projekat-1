@@ -51,8 +51,6 @@ foreach ($data as $key => $value) {
 $jobController = new JobController();
 $updateStatus = $jobController->updateJob($_GET['id'], $data);
 
-var_dump($updateStatus);
-
 if ($updateStatus) {
     SuccessManager::redirectToSuccessPage('update-success');
 }

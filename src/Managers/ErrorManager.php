@@ -8,7 +8,7 @@ class ErrorManager
 {
     public static function redirectToErrorPage(string $err): void
     {
-        header('Location: /praksa-projekat-1/src/Pages/error.php?err=' . $err);
+        header('Location: /src/Pages/error.php?err=' . $err);
         exit();
     }
 

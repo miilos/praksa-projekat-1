@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1:3307
--- Generation Time: Apr 14, 2025 at 10:08 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Apr 22, 2025 at 10:57 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -46,6 +46,28 @@ INSERT INTO `applications` (`applicationId`, `userId`, `jobId`, `submittedAt`) V
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `comments`
+--
+
+CREATE TABLE `comments` (
+  `comment_id` int(11) NOT NULL,
+  `user_id` varchar(50) NOT NULL,
+  `job_id` varchar(50) NOT NULL,
+  `text` varchar(255) NOT NULL,
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`comment_id`, `user_id`, `job_id`, `text`, `createdAt`) VALUES
+(15, '16cba2b1-58a9-438f-aa67-92e8715be11d', 'b2c592be-db13-4a94-96a1-3bf4b05789a9', 'dobar oglas', '2025-04-21 14:31:51'),
+(16, '16cba2b1-58a9-438f-aa67-92e8715be11d', '438c0d92-4efc-4048-8945-e58266610e2b', 'dobar komentar', '2025-04-21 14:35:46');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `employers`
 --
 
@@ -76,6 +98,13 @@ CREATE TABLE `favourites` (
   `jobId` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `favourites`
+--
+
+INSERT INTO `favourites` (`favouriteId`, `userId`, `jobId`) VALUES
+('b2b7ae70-320f-4535-abd3-aa7784587a45', '16cba2b1-58a9-438f-aa67-92e8715be11d', 'b2c592be-db13-4a94-96a1-3bf4b05789a9');
+
 -- --------------------------------------------------------
 
 --
@@ -91,7 +120,7 @@ CREATE TABLE `jobs` (
   `startSalary` int(11) NOT NULL,
   `shifts` int(11) NOT NULL DEFAULT 1,
   `location` varchar(50) NOT NULL,
-  `createdAt` date NOT NULL DEFAULT current_timestamp(),
+  `createdAt` datetime NOT NULL DEFAULT current_timestamp(),
   `flexibleHours` tinyint(1) NOT NULL,
   `workFromHome` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -101,10 +130,51 @@ CREATE TABLE `jobs` (
 --
 
 INSERT INTO `jobs` (`jobId`, `employerId`, `jobName`, `description`, `field`, `startSalary`, `shifts`, `location`, `createdAt`, `flexibleHours`, `workFromHome`) VALUES
-('2ad67dc2-3f84-45de-a4f3-3f17fc70d79d', 'asjdlf1023', 'Software engineer', 'softver engineer u guglu', 'it', 200000, 1, 'Novi Sad', '2025-04-12', 1, 1),
+('2ad67dc2-3f84-45de-a4f3-3f17fc70d79d', 'asjdlf1023', 'Software engineer', 'softver engineer u guglu kul', 'it', 200000, 1, 'Novi Sad', '2025-04-12', 1, 1),
 ('438c0d92-4efc-4048-8945-e58266610e2b', 'asdf123', 'Menadzer u knjizari', 'menadzer u laguni', 'menadzment', 210000, 1, 'Subotica', '2025-04-09', 1, 0),
 ('9dbb71c2-5fcf-4a49-a1c9-e68b921f055f', 'asjdlf1023', 'Backend web developer', 'backend web developer u guglu', 'it', 200000, 1, 'Beograd', '2025-04-09', 1, 1),
 ('b2c592be-db13-4a94-96a1-3bf4b05789a9', 'asdf123', 'Prodavac u knjizari', 'prodavac u laguni', 'prodaja', 150000, 2, 'Subotica', '2025-04-09', 0, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `job_fields`
+--
+
+CREATE TABLE `job_fields` (
+  `field_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `job_fields`
+--
+
+INSERT INTO `job_fields` (`field_id`, `name`) VALUES
+(1, 'it'),
+(2, 'menadzment'),
+(3, 'prodaja');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `locations`
+--
+
+CREATE TABLE `locations` (
+  `location_id` int(11) NOT NULL,
+  `city` varchar(255) NOT NULL,
+  `country` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `locations`
+--
+
+INSERT INTO `locations` (`location_id`, `city`, `country`) VALUES
+(1, 'Subotica', 'Serbia'),
+(2, 'Novi Sad', 'Serbia'),
+(3, 'Beograd', 'Serbia');
 
 -- --------------------------------------------------------
 
@@ -145,6 +215,14 @@ ALTER TABLE `applications`
   ADD KEY `fk_application_job` (`jobId`);
 
 --
+-- Indexes for table `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`comment_id`),
+  ADD KEY `fk_comment_job` (`job_id`),
+  ADD KEY `fk_comment_user` (`user_id`);
+
+--
 -- Indexes for table `employers`
 --
 ALTER TABLE `employers`
@@ -166,11 +244,45 @@ ALTER TABLE `jobs`
   ADD KEY `employerId` (`employerId`);
 
 --
+-- Indexes for table `job_fields`
+--
+ALTER TABLE `job_fields`
+  ADD PRIMARY KEY (`field_id`);
+
+--
+-- Indexes for table `locations`
+--
+ALTER TABLE `locations`
+  ADD PRIMARY KEY (`location_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`userId`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT for table `job_fields`
+--
+ALTER TABLE `job_fields`
+  MODIFY `field_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `locations`
+--
+ALTER TABLE `locations`
+  MODIFY `location_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
@@ -182,6 +294,13 @@ ALTER TABLE `users`
 ALTER TABLE `applications`
   ADD CONSTRAINT `fk_application_job` FOREIGN KEY (`jobId`) REFERENCES `jobs` (`jobId`),
   ADD CONSTRAINT `fk_application_user` FOREIGN KEY (`userId`) REFERENCES `users` (`userId`);
+
+--
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `fk_comment_job` FOREIGN KEY (`job_id`) REFERENCES `jobs` (`jobId`),
+  ADD CONSTRAINT `fk_comment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`userId`);
 
 --
 -- Constraints for table `favourites`

@@ -2,10 +2,7 @@
 
 namespace App\Models;
 
-use App\Core\Db;
 use App\Core\QueryBuilder;
-use App\Managers\ErrorManager;
-use PDO;
 use Ramsey\Uuid\Uuid;
 
 class JobApplicationModel
@@ -46,5 +43,15 @@ class JobApplicationModel
 
         $qb->where([ 'userId' => $userId ], table: 'applications');
         return $qb->execute();
+    }
+
+    public static function userAppliedToJob(string $userId, string $jobId): array|bool
+    {
+        $qb = new QueryBuilder();
+        $qb->select('*');
+        $qb->table('applications');
+        $qb->where([ 'userId' => $userId ]);
+        $qb->where([ 'jobId' => $jobId ]);
+        return $qb->execute(fetch: 'one');
     }
 }

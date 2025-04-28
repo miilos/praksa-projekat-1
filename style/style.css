@@ -437,6 +437,10 @@ label[for="flexibleHours"] {
     justify-content: space-between;
 }
 
+.job-admin-btns a:first-child {
+    margin-right: .7rem;
+}
+
 /* comment styles */
 
 .job-comments {

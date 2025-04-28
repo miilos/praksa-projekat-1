@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-use App\Managers\ErrorManager;
+use App\Controllers\ErrorController;
 use PDO;
 use PDOException;
 
@@ -28,10 +28,10 @@ class Db
         }
         catch (PDOException $e) {
             var_dump($e->getMessage());
-            //ErrorManager::redirectToErrorPage('db-error');
+            //ErrorController::redirectToErrorPage('db-error');
         }
         catch (\Throwable $t) {
-            ErrorManager::redirectToErrorPage('unknown-error');
+            ErrorController::redirectToErrorPage('unknown-error');
         }
     }
 

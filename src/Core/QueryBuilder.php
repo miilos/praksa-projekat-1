@@ -2,7 +2,7 @@
 
 namespace App\Core;
 
-use App\Managers\ErrorManager;
+use App\Controllers\ErrorController;
 
 class QueryBuilder
 {
@@ -206,13 +206,13 @@ class QueryBuilder
         catch (\PDOException $e) {
             echo $e->getMessage();
             $this->close();
-            ErrorManager::redirectToErrorPage('db-error');
+            ErrorController::redirectToErrorPage('db-error');
             return [];
         }
         catch (\Throwable $t) {
             echo $t->getMessage();
             $this->close();
-            ErrorManager::redirectToErrorPage('unknown-error');
+            ErrorController::redirectToErrorPage('unknown-error');
             return [];
         }
     }

@@ -50,6 +50,16 @@ class FavouritesModel
         return $qb->execute();
     }
 
+    public static function checkIfFavourite(string $userId, string $jobId): array
+    {
+        $qb = new QueryBuilder();
+        $qb->select('*');
+        $qb->table('favourites');
+        $qb->where(['userId' => $userId]);
+        $qb->where(['jobId' => $jobId]);
+        return $qb->execute();
+    }
+
     public static function removeFavourite(string $favouriteId): bool
     {
         $qb = new QueryBuilder();

@@ -2,14 +2,35 @@
 
 namespace App\Controllers;
 
+use App\Core\Request;
 use App\Managers\EmailManager;
-use App\Managers\ErrorManager;
 use App\Managers\SessionManager;
 use App\Models\UserModel;
+use App\Views\View;
 
 class AuthController
 {
-    public function signup(array $data): bool|array
+    public function signup(Request $req): string
+    {
+        $data = $req->getBody();
+        $validationRes = null;
+        if ($data) {
+            $validationRes = $this->signUserUp($data);
+        }
+
+        $errors = [];
+        if (is_array($validationRes)) {
+            $errors = $validationRes;
+        }
+
+        $view = new View();
+        return $view->render('signup', [
+            'pageTitle' => 'Sign up',
+            'errors' => $errors,
+        ]);
+    }
+
+    private function signUserUp(array $data): bool|array
     {
         $userModel = new UserModel(
             $data['firstName'],
@@ -32,7 +53,7 @@ class AuthController
                 'Vas nalog je uspesno kreiran. Hvala sto koristite nasu platformu!'
             );
 
-            header('Location: ../Pages/home.php');
+            header('Location: /home');
             return true;
         }
         else {
@@ -40,7 +61,24 @@ class AuthController
         }
     }
 
-    public function logIn(array $data): bool
+    public function login(Request $req): string
+    {
+        $data = $req->getBody();
+        $errors = [];
+
+        if ($data && !$this->logUserIn($data)) {
+            $errors['email'][] = 'Username ili email nisu tacni';
+            $errors['password'][] = 'Username ili email nisu tacni';
+        }
+
+        $view = new View();
+        return $view->render('login', [
+            'pageTitle' => 'Home',
+            'errors' => $errors
+        ]);
+    }
+
+    private function logUserIn(array $data): bool
     {
         $user = UserModel::getUserByEmail($data['email']);
 
@@ -52,7 +90,7 @@ class AuthController
         }
 
         SessionManager::startSession('user', $user);
-        header("Location: ../Pages/home.php");
+        header("Location: /home");
         return true;
     }
 

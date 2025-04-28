@@ -4,26 +4,35 @@ namespace App\Core;
 
 class Request
 {
-    private function getMethod(): string
+    public function getMethod(): string
     {
-        return $_SERVER['REQUEST_METHOD'];
+        return strtolower($_SERVER['REQUEST_METHOD']);
+    }
+
+    public function getUrlParams(): array
+    {
+        $params = [];
+
+        foreach ($_GET as $key => $value) {
+            $params[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+        }
+
+        return $params;
     }
 
     public function getBody(): array
     {
         $body = [];
 
-        if ($this->getMethod() === "GET") {
-            foreach ($_GET as $key => $value) {
-                $body[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
-        }
-        else if ($this->getMethod() === "POST") {
-            foreach ($_POST as $key => $value) {
-                $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-            }
+        foreach ($_POST as $key => $value) {
+            $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
         }
 
         return $body;
+    }
+
+    public function getPath(): string
+    {
+        return explode('?', $_SERVER['REQUEST_URI'])[0];
     }
 }

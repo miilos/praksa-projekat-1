@@ -5,10 +5,12 @@ namespace App\Controllers;
 // each part of the app will grab the error message from the getErrors() method
 // and then call the redirectToErrorPage() method with the given message
 use App\Core\Request;
+use App\Core\Route;
 use App\Views\View;
 
 class ErrorController
 {
+    #[Route(method: 'get', path: 'error/{msg}', name: 'error')]
     public function error(Request $req): string
     {
         $msg = $req->getUrlParams()['msg'] ?? null;

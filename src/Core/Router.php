@@ -2,9 +2,11 @@
 
 namespace App\Core;
 
+use ReflectionClass;
+
 class Router
 {
-    private array $routes;
+    public array $routes;
     private Request $request;
 
     public function __construct(Request $request)
@@ -17,16 +19,20 @@ class Router
         $this->routes[$method][$path] = $action;
     }
 
-    public function get(string $path, callable|array $action): self
+    public function registerRouteAttributes(array $controllers): void
     {
-        $this->registerRoute('get', $path, $action);
-        return $this;
-    }
+        foreach ($controllers as $controller) {
+            $reflectionController = new ReflectionClass($controller);
 
-    public function post(string $path, callable|array $action): self
-    {
-        $this->registerRoute('post', $path, $action);
-        return $this;
+            foreach ($reflectionController->getMethods() as $method) {
+                $attributes = $method->getAttributes(Route::class);
+
+                foreach ($attributes as $attribute) {
+                    $route = $attribute->newInstance();
+                    $this->registerRoute($route->method, $route->path, [$controller, $method->getName()]);
+                }
+            }
+        }
     }
 
     private function resolveParams(string $method, string $path): array

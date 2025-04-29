@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Route;
 use App\Managers\EmailManager;
 use App\Managers\SessionManager;
 use App\Models\JobApplicationModel;
@@ -10,6 +11,8 @@ use App\Views\View;
 
 class JobApplicationController
 {
+    #[Route(method: 'get', path: '/apply/{id}', name: 'applyGet')]
+    #[Route(method: 'post', path: '/apply/{id}', name: 'applyPost')]
     public function apply(Request $req): string
     {
         $body = $req->getBody();

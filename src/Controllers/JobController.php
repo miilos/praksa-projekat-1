@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Route;
 use App\Managers\SessionManager;
 use App\Models\FavouritesModel;
 use App\Models\JobModel;
@@ -11,6 +12,8 @@ use App\Views\View;
 
 class JobController
 {
+    #[Route(method: 'get', path: '/', name: 'indexGet')]
+    #[Route(method: 'post', path: '/', name: 'indexPost')]
     public function index(Request $req): string
     {
         $user = SessionManager::getSessionData('user');
@@ -43,6 +46,7 @@ class JobController
         ]);
     }
 
+    #[Route(method: 'get', path: '/job/{id}', name: 'jobDetails')]
     public function jobDetails(Request $req): string
     {
         $jobId = $req->getUrlParams()['id'];
@@ -72,6 +76,7 @@ class JobController
         ]);
     }
 
+    #[Route(method: 'get', path: '/home', name: 'home')]
     public function home(Request $req): string
     {
         $user = SessionManager::getSessionData('user');
@@ -108,6 +113,7 @@ class JobController
         ]);
     }
 
+    #[Route(method: 'get', path: '/adminSelection', name: 'adminSelection')]
     public function adminSelection(Request $req): string
     {
         $jobs = JobModel::getJobNames();
@@ -121,6 +127,8 @@ class JobController
         ]);
     }
 
+    #[Route(method: 'get', path: '/job/create', name: 'createJobGet')]
+    #[Route(method: 'post', path: '/job/create', name: 'createJobPost')]
     public function create(Request $req): string
     {
         $body = $req->getBody();
@@ -177,6 +185,7 @@ class JobController
         }
     }
 
+    #[Route(method: 'get', path: '/job/update/{id}', name: 'updateJob')]
     public function update(Request $req): string
     {
         $user = SessionManager::getSessionData('user');
@@ -201,6 +210,7 @@ class JobController
         ]);
     }
 
+    #[Route(method: 'post', path: '/executeUpdate/{id}', name: 'executeJobUpdate')]
     public function executeUpdate(Request $req): bool
     {
         $jobId = $req->getUrlParams()['id'];
@@ -255,6 +265,7 @@ class JobController
         }
     }
 
+    #[Route(method: 'get', path: '/job/delete/{id}', name: 'deleteJob')]
     public function delete(Request $req): bool
     {
         $jobId = $req->getUrlParams()['id'];

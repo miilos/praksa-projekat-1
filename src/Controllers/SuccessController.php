@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Route;
 use App\Views\View;
 
 class SuccessController
 {
+    #[Route(method: 'get', path: '/success/{msg}', name: 'success')]
     public function success(Request $req): string
     {
         $msg = $req->getUrlParams()['msg'] ?? null;

@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Route;
 use App\Managers\EmailManager;
 use App\Managers\SessionManager;
 use App\Models\UserModel;
@@ -10,6 +11,8 @@ use App\Views\View;
 
 class AuthController
 {
+    #[Route(method: 'get', path: '/signup', name: 'signupGet')]
+    #[Route(method: 'post', path: '/signup', name: 'signupPost')]
     public function signup(Request $req): string
     {
         $data = $req->getBody();
@@ -61,6 +64,8 @@ class AuthController
         }
     }
 
+    #[Route(method: 'get', path: '/login', name: 'loginGet')]
+    #[Route(method: 'post', path: '/login', name: 'loginPost')]
     public function login(Request $req): string
     {
         $data = $req->getBody();

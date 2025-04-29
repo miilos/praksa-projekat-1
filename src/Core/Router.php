@@ -29,12 +29,53 @@ class Router
         return $this;
     }
 
+    private function resolveParams(string $method, string $path): array
+    {
+        $requestedRoute = '/' . trim($path, '/') ?? '/';
+        $routes = $this->routes[$method];
+        $routeParams = [];
+        $definedRoute = '';
+
+        foreach ($routes as $route => $action) {
+            // convert route to regex
+            $routeRegex = preg_replace_callback('/{\w+(:([^}]+))?}/', function ($matches) {
+                return isset ($matches[1]) ? '(' . $matches[2] . ')' : '([a-zA-Z0-9_-]+)';
+            }, $route);
+            $routeRegex = '@^' . $routeRegex . '$@';
+
+            // check if current route matches the regex
+            if (preg_match($routeRegex, $requestedRoute, $matches)) {
+                // remove full match and save dynamic param values
+                array_shift($matches);
+                $routeParamVals = $matches;
+
+                // get param names
+                $routeParamNames = [];
+                if (preg_match_all('/{(\w+)(:[^}]+)?}/', $route, $matches))
+                {
+                    $routeParamNames = $matches[1];
+                }
+
+                // get route as it's written in the routing function
+                $definedRoute = $route;
+                // combine route names and values into an associative array
+                $routeParams = array_combine($routeParamNames, $routeParamVals);
+            }
+        }
+
+        // [ route as defined in the router, route params ]
+        return [$definedRoute, $routeParams];
+    }
+
     public function resolve(): void
     {
         $method = $this->request->getMethod();
         $path = $this->request->getPath();
 
-        $action = $this->routes[$method][$path];
+        $routeParams = $this->resolveParams($method, $path);
+        $this->request->setUrlParams($routeParams[1]);
+
+        $action = $this->routes[$method][$routeParams[0]];
 
         if (is_callable($action)) {
             echo call_user_func($action);

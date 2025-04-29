@@ -1,4 +1,4 @@
-<form method="post" action="/apply?jobId=<?= $jobId ?>" class="form" autocomplete="off">
+<form method="post" action="/apply/<?= $jobId ?>" class="form" autocomplete="off">
     <h1>Vasi podaci za prijavu na oglas:</h1>
     <input type="hidden" class="input" value="<?= $user['userId'] ?>" name="userId">
     <input type="hidden" class="input" value="<?= $jobId ?>" name="jobId">

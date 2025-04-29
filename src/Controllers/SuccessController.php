@@ -29,7 +29,7 @@ class SuccessController
 
     public static function redirectToSuccessPage($msg): void
     {
-        header('Location: /success?msg=' . $msg);
+        header('Location: /success/' . $msg);
         exit();
     }
 

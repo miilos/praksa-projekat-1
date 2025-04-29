@@ -4,20 +4,21 @@ namespace App\Core;
 
 class Request
 {
+    private array $urlParams = [];
+
     public function getMethod(): string
     {
         return strtolower($_SERVER['REQUEST_METHOD']);
     }
 
+    public function setUrlParams(array $urlParams): void
+    {
+        $this->urlParams = $urlParams;
+    }
+
     public function getUrlParams(): array
     {
-        $params = [];
-
-        foreach ($_GET as $key => $value) {
-            $params[$key] = filter_input(INPUT_GET, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-        }
-
-        return $params;
+        return $this->urlParams;
     }
 
     public function getBody(): array

@@ -64,7 +64,7 @@ class JobRenderer
                 </div>
     
                 <div class="job-apply-btn">
-                    <a href="/job?id=' . $job['jobId'] . '" class="btn btn--primary">Vidi jos</a>
+                    <a href="/job/' . $job['jobId'] . '" class="btn btn--primary">Vidi jos</a>
                 </div>
             </div>
         ';
@@ -157,8 +157,8 @@ class JobRenderer
             <div class="job-admin">
                 <h2 class="job-admin-name">' . $job['jobName'] . '</h2>
                 <div class="job-admin-btns">
-                    <a class="btn btn--primary" href="/job/update?jobId=' . $job['jobId'] . '">Update</a>
-                    <a class="btn btn--primary" href="/job/delete?jobId=' . $job['jobId'] . '">Delete</a>
+                    <a class="btn btn--primary" href="/job/update/' . $job['jobId'] . '">Update</a>
+                    <a class="btn btn--primary" href="/job/delete/' . $job['jobId'] . '">Delete</a>
                 </div>
             </div>
         ';

@@ -1,4 +1,4 @@
-<form method="post" action="/createJob" class="form" autocomplete="off">
+<form method="post" action="/job/create" class="form" autocomplete="off">
     <h1 class="form-title">Kreirajte oglas</h1>
 
     <?php

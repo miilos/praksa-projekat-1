@@ -180,7 +180,7 @@ class JobController
     public function update(Request $req): string
     {
         $user = SessionManager::getSessionData('user');
-        $jobId = $req->getUrlParams()['jobId'];
+        $jobId = $req->getUrlParams()['id'];
 
         if (!$user || $user['role'] !== 'admin') {
             ErrorController::redirectToErrorPage('not-authorized');
@@ -203,7 +203,7 @@ class JobController
 
     public function executeUpdate(Request $req): bool
     {
-        $jobId = $req->getUrlParams()['jobId'];
+        $jobId = $req->getUrlParams()['id'];
         $job = null;
         if (!$jobId || !($job = JobModel::getJobById($jobId))) {
             ErrorController::redirectToErrorPage('bad-job-id');
@@ -257,7 +257,7 @@ class JobController
 
     public function delete(Request $req): bool
     {
-        $jobId = $req->getUrlParams()['jobId'];
+        $jobId = $req->getUrlParams()['id'];
 
         if (!$jobId) {
             ErrorController::redirectToErrorPage('bad-job-id');

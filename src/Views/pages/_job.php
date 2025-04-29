@@ -117,7 +117,7 @@
     else {
         echo '
                     <h1 class="job-application-title">Prijavi se!</h1>
-                    <a href="/apply?jobId=' . $job['jobId'] . '" class="btn btn--secondary">Posalji prijavu</a>
+                    <a href="/apply/' . $job['jobId'] . '" class="btn btn--secondary">Posalji prijavu</a>
                 ';
     }
     ?>

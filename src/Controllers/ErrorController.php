@@ -28,7 +28,7 @@ class ErrorController
 
     public static function redirectToErrorPage(string $err): void
     {
-        header('Location: /error?err=' . $err);
+        header('Location: /error/' . $err);
         exit();
     }
 

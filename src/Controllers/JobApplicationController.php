@@ -14,7 +14,7 @@ class JobApplicationController
     {
         $body = $req->getBody();
         $user = SessionManager::getSessionData('user');
-        $jobId = $req->getUrlParams()['jobId'];
+        $jobId = $req->getUrlParams()['id'];
 
         if (!$user) {
             header("location: /login");

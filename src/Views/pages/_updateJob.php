@@ -1,4 +1,4 @@
-<form method="post" action="/executeUpdate?jobId=<?= $job['jobId'] ?>" class="form" autocomplete="off">
+<form method="post" action="/executeUpdate/<?= $job['jobId'] ?>" class="form" autocomplete="off">
     <h1 class="form-title">Azuriraj oglas</h1>
 
     <?php

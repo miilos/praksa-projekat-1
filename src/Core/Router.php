@@ -6,12 +6,14 @@ use ReflectionClass;
 
 class Router
 {
-    public array $routes;
+    private array $routes;
     private Request $request;
+    private Response $response;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, Response $response)
     {
         $this->request = $request;
+        $this->response = $response;
     }
 
     public function registerRoute(string $method, string $path, callable|array $action): void
@@ -92,7 +94,7 @@ class Router
 
             if (class_exists($class) && method_exists($class, $method)) {
                 $class = new $class();
-                echo call_user_func_array([$class, $method], ['req' => $this->request]);
+                echo call_user_func_array([$class, $method], ['req' => $this->request, 'res' => $this->response]);
             }
         }
     }

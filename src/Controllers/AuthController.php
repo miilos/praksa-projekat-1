@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Response;
 use App\Core\Route;
 use App\Managers\EmailManager;
 use App\Managers\SessionManager;
@@ -13,7 +14,7 @@ class AuthController
 {
     #[Route(method: 'get', path: '/signup', name: 'signupGet')]
     #[Route(method: 'post', path: '/signup', name: 'signupPost')]
-    public function signup(Request $req): string
+    public function signup(Request $req, Response $res): string
     {
         $data = $req->getBody();
         $validationRes = null;
@@ -66,7 +67,7 @@ class AuthController
 
     #[Route(method: 'get', path: '/login', name: 'loginGet')]
     #[Route(method: 'post', path: '/login', name: 'loginPost')]
-    public function login(Request $req): string
+    public function login(Request $req, Response $res): string
     {
         $data = $req->getBody();
         $errors = [];

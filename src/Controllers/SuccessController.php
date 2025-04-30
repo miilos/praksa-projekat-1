@@ -3,13 +3,14 @@
 namespace App\Controllers;
 
 use App\Core\Request;
+use App\Core\Response;
 use App\Core\Route;
 use App\Views\View;
 
 class SuccessController
 {
     #[Route(method: 'get', path: '/success/{msg}', name: 'success')]
-    public function success(Request $req): string
+    public function success(Request $req, Response $res): string
     {
         $msg = $req->getUrlParams()['msg'] ?? null;
         $header = '';

@@ -29,7 +29,7 @@ class JobApplicationModel
         if ($onlyIds) {
             $qb->select('j.jobId', 'a.submittedAt');
             $qb->table('applications');
-            $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
+            $qb->join('INNER JOIN', 'jobs', 'a.jobId', 'j.jobId');
         }
         else {
             $qb->select(
@@ -37,8 +37,8 @@ class JobApplicationModel
                 'j.location', 'j.createdAt', 'j.flexibleHours' ,'j.workFromHome', 'a.submittedAt', 'a.userId', 'e.employerName'
             );
             $qb->table('applications');
-            $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
-            $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+            $qb->join('INNER JOIN', 'jobs', 'a.jobId', 'j.jobId');
+            $qb->join('INNER JOIN', 'employers', 'j.employerId', 'e.employerId');
         }
 
         $qb->where([ 'userId' => $userId ], table: 'applications');

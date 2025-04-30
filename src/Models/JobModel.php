@@ -27,7 +27,7 @@ class JobModel extends Model
         $qb = new QueryBuilder();
         $qb->select('*');
         $qb->table('jobs');
-        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+        $qb->join('INNER JOIN', 'employers', 'e.employerId', 'j.employerId');
 
         if ($filter) {
             foreach ($filter as $field => $value) {
@@ -43,7 +43,7 @@ class JobModel extends Model
         $qb = new QueryBuilder();
         $qb->select('*');
         $qb->table('jobs');
-        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+        $qb->join('INNER JOIN', 'employers', 'j.employerId', 'e.employerId');
 
         $filtersNotEmpty = self::checkFiltersEmpty($filters);
         if ($filtersNotEmpty) {
@@ -73,12 +73,12 @@ class JobModel extends Model
         return count(array_filter($filters)) > 0;
     }
 
-    public static function getJobById(string $id): array
+    public static function getJobById(string $id): array|bool
     {
         $qb = new QueryBuilder();
         $qb->select('*');
         $qb->table('jobs');
-        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+        $qb->join('INNER JOIN', 'employers', 'j.employerId', 'e.employerId');
         $qb->where(['jobId' => $id]);
         return $qb->execute('one');
     }
@@ -93,7 +93,7 @@ class JobModel extends Model
 
     public function validate(): bool
     {
-        if ($this->employerId === '-') {
+        if (!$this->employerId || $this->employerId === '-') {
             $this->errors['employerId'][] = 'Morate izabrati poslodavca';
         }
 
@@ -105,7 +105,7 @@ class JobModel extends Model
             $this->errors['description'][] = 'Morate unesti opis oglasa';
         }
 
-        if ($this->field === '-') {
+        if (!$this->field || $this->field === '-') {
             $this->errors['field'][] = 'Morate izabrati polje rada';
         }
 
@@ -113,14 +113,14 @@ class JobModel extends Model
             $this->errors['startSalary'][] = 'Morate uneti pocetnu platu';
         }
 
-        if ($this->location === '-') {
+        if (!$this->location || $this->location === '-') {
             $this->errors['location'][] = 'Morate izabrati lokaciju posla';
         }
 
         return empty($this->errors);
     }
 
-    public function createJob(): void
+    public function createJob(): array
     {
         $jobId = Uuid::uuid4();
         $qb = new QueryBuilder();
@@ -140,9 +140,12 @@ class JobModel extends Model
             'workFromHome' => isset($this->workFromHome) ? 1 : 0
         ]);
         $qb->execute();
+
+        // return newly created job
+        return self::getJobById($jobId);
     }
 
-    public static function updateJob(string $id, array $data): bool
+    public static function updateJob(string $id, array $data): bool|array
     {
         if (isset($data['flexibleHours'])) {
             $data['flexibleHours'] = ($data['flexibleHours'] === 'on') ? 1 : 0;
@@ -157,7 +160,11 @@ class JobModel extends Model
         $qb->table('jobs');
         $qb->values($data);
         $qb->where(['jobId' => $id]);
-        return $qb->execute();
+        $updateStatus = $qb->execute();
+
+
+        // return newly updated job
+        return self::getJobById($id);
     }
 
     public static function deleteJob(string $id): bool

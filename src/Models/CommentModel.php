@@ -21,7 +21,7 @@ class CommentModel
         $qb = new QueryBuilder();
         $qb->select('*');
         $qb->table('comments');
-        $qb->join('INNER JOIN', 'users', 'user_id', 'userId');
+        $qb->join('INNER JOIN', 'users', 'c.user_id', 'u.userId');
         $qb->where(['job_id' => $jobId]);
         return $qb->execute();
     }

@@ -2,9 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Core\APIException;
 use App\Core\Request;
+use App\Core\Response;
 use App\Core\Route;
 use App\Managers\SessionManager;
+use App\Models\CommentModel;
 use App\Models\FavouritesModel;
 use App\Models\JobModel;
 use App\Views\JobRenderer;
@@ -14,7 +17,7 @@ class JobController
 {
     #[Route(method: 'get', path: '/', name: 'indexGet')]
     #[Route(method: 'post', path: '/', name: 'indexPost')]
-    public function index(Request $req): string
+    public function index(Request $req, Response $res): string
     {
         $user = SessionManager::getSessionData('user');
 
@@ -47,7 +50,7 @@ class JobController
     }
 
     #[Route(method: 'get', path: '/job/{id}', name: 'jobDetails')]
-    public function jobDetails(Request $req): string
+    public function jobDetails(Request $req, Response $res): string
     {
         $jobId = $req->getUrlParams()['id'];
 
@@ -77,7 +80,7 @@ class JobController
     }
 
     #[Route(method: 'get', path: '/home', name: 'home')]
-    public function home(Request $req): string
+    public function home(Request $req, Response $res): string
     {
         $user = SessionManager::getSessionData('user');
 
@@ -114,7 +117,7 @@ class JobController
     }
 
     #[Route(method: 'get', path: '/adminSelection', name: 'adminSelection')]
-    public function adminSelection(Request $req): string
+    public function adminSelection(Request $req, Response $res): string
     {
         $jobs = JobModel::getJobNames();
         $jobRenderer = new JobRenderer();
@@ -129,7 +132,7 @@ class JobController
 
     #[Route(method: 'get', path: '/job/create', name: 'createJobGet')]
     #[Route(method: 'post', path: '/job/create', name: 'createJobPost')]
-    public function create(Request $req): string
+    public function create(Request $req, Response $res): string
     {
         $body = $req->getBody();
         $user = SessionManager::getSessionData('user');
@@ -186,7 +189,7 @@ class JobController
     }
 
     #[Route(method: 'get', path: '/job/update/{id}', name: 'updateJob')]
-    public function update(Request $req): string
+    public function update(Request $req, Response $res): string
     {
         $user = SessionManager::getSessionData('user');
         $jobId = $req->getUrlParams()['id'];
@@ -210,8 +213,46 @@ class JobController
         ]);
     }
 
+    private function prepDataForUpdate(array $data, array $job): array
+    {
+        // go through request body and remove all fields that were not changed in the update form
+
+        $newData = [...$data];
+
+        // flexibleHours and workFromHome checkboxes don't appear in the
+        // request body if they're unchecked, so they need to be checked separately
+        // if they were unchecked and their value in the db is 1, they were changed in the form
+        if (!isset($newData['flexibleHours']) && $job['flexibleHours']) {
+            $data['flexibleHours'] = 0;
+        }
+
+        if (!isset($newData['workFromHome']) && $job['workFromHome']) {
+            $newData['workFromHome'] = 0;
+        }
+
+        foreach ($newData as $key => $value) {
+            // if both checkboxes are set and they are 1 in the db, remove them because they weren't changed
+            // if they're 0, they were set before the loop and shouldn't be removed
+            if ($key === 'flexibleHours' && $job['flexibleHours'] && $value !== 0) {
+                unset($newData[$key]);
+                continue;
+            }
+
+            if ($key === 'workFromHome' && $job['workFromHome'] && $value !== 0) {
+                unset($newData[$key]);
+                continue;
+            }
+
+            if ($job[$key] == $value) {
+                unset($newData[$key]);
+            }
+        }
+
+        return $newData;
+    }
+
     #[Route(method: 'post', path: '/executeUpdate/{id}', name: 'executeJobUpdate')]
-    public function executeUpdate(Request $req): bool
+    public function executeUpdate(Request $req, Response $res): bool
     {
         $jobId = $req->getUrlParams()['id'];
         $job = null;
@@ -221,41 +262,11 @@ class JobController
         }
 
         $data = $req->getBody();
+        $data = $this->prepDataForUpdate($data, $job);
 
-        // go through request body and remove all fields that were not changed in the update form
+        $updatedJob = JobModel::updateJob($job['jobId'], $data);
 
-        // flexibleHours and workFromHome checkboxes don't appear in the
-        // request body if they're unchecked, so they need to be checked separately
-        // if they were unchecked and their value in the db is 1, they were changed in the form
-        if (!isset($data['flexibleHours']) && $job['flexibleHours']) {
-            $data['flexibleHours'] = 0;
-        }
-
-        if (!isset($data['workFromHome']) && $job['workFromHome']) {
-            $data['workFromHome'] = 0;
-        }
-
-        foreach ($data as $key => $value) {
-            // if both checkboxes are set and they are 1 in the db, remove them because they weren't changed
-            // if they're 0, they were set before the loop and shouldn't be removed
-            if ($key === 'flexibleHours' && $job['flexibleHours'] && $value !== 0) {
-                unset($data[$key]);
-                continue;
-            }
-
-            if ($key === 'workFromHome' && $job['workFromHome'] && $value !== 0) {
-                unset($data[$key]);
-                continue;
-            }
-
-            if ($job[$key] == $value) {
-                unset($data[$key]);
-            }
-        }
-
-        $updateStatus = JobModel::updateJob($job['jobId'], $data);
-
-        if ($updateStatus) {
+        if ($updatedJob) {
             SuccessController::redirectToSuccessPage('update-success');
             return true;
         }
@@ -266,7 +277,7 @@ class JobController
     }
 
     #[Route(method: 'get', path: '/job/delete/{id}', name: 'deleteJob')]
-    public function delete(Request $req): bool
+    public function delete(Request $req, Response $res): bool
     {
         $jobId = $req->getUrlParams()['id'];
 
@@ -283,6 +294,132 @@ class JobController
         else {
             ErrorController::redirectToErrorPage('delete-error');
             return false;
+        }
+    }
+
+    /* API functions */
+
+    #[Route(method: 'get', path: '/api/v1/jobs', name: 'getAllJobs')]
+    public function getAllJobsApi(Request $req, Response $res): string
+    {
+        try {
+            $jobs = JobModel::getJobs();
+
+            return $res->statusCode(200)->sendJSON([
+                'status' => 'success',
+                'data' => [
+                    'jobs' => $jobs
+                ]
+            ]);
+        }
+        catch (APIException $e) {
+            return ErrorController::handleAPIError($res, $e, $e->statusCode);
+        }
+        catch (\Throwable $t) {
+            return ErrorController::handleAPIError($res, $t);
+        }
+    }
+
+    #[Route(method: 'get', path: '/api/v1/jobs/{id}', name: 'getJobById')]
+    public function getJobByIdApi(Request $req, Response $res): string
+    {
+        try {
+            $id = $req->getUrlParams()['id'];
+            $job = JobModel::getJobById($id);
+
+            if (!$job) {
+                throw new APIException('posao s tim idjem ne postoji', 400);
+            }
+
+            $comments = CommentModel::getCommentsForJob($job['jobId']);
+            $job['comments'] = $comments;
+
+            return $res->statusCode(200)->sendJSON([
+                'status' => 'success',
+                'data' => [
+                    'job' => $job
+                ]
+            ]);
+        }
+        catch (APIException $e) {
+            return ErrorController::handleAPIError($res, $e, $e->statusCode);
+        }
+        catch (\Throwable $t) {
+            return ErrorController::handleAPIError($res, $t);
+        }
+    }
+
+    #[Route(method: 'post', path: '/api/v1/jobs', name: 'createJob')]
+    public function createJobApi(Request $req, Response $res): string
+    {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $jobModel = new JobModel(
+                $data['employerId'] ?? '-',
+                $data['jobName'] ?? '',
+                $data['description'] ?? '',
+                $data['field'] ?? '',
+                (int)$data['startSalary'] ?? 0,
+                $data['shifts'] ?? '',
+                $data['location'] ?? '',
+                isset($data['flexibleHours']),
+                isset($data['workFromHome'])
+            );
+
+            if ($jobModel->validate()) {
+                $newJob = $jobModel->createJob();
+                return $res->statusCode(201)->sendJSON([
+                    'status' => 'success',
+                    'message' => 'job created!',
+                    'data' => [
+                        'job' => $newJob
+                    ]
+                ]);
+            }
+            else {
+                return $res->statusCode(400)->sendJSON([
+                    'status' => 'error',
+                    'message' => 'validation error',
+                    'errors' => $jobModel->getValidationErrors()
+                ]);
+            }
+        }
+        catch (APIException $e) {
+            return ErrorController::handleAPIError($res, $e, $e->statusCode);
+        }
+        catch (\Throwable $t) {
+            return ErrorController::handleAPIError($res, $t);
+        }
+    }
+
+    #[Route(method: 'patch', path: '/api/v1/jobs/{id}', name: 'updateJob')]
+    public function updateJobApi(Request $req, Response $res): string
+    {
+        try {
+            $data = $req->getBody();
+            $jobId = $req->getUrlParams()['id'];
+            $job = null;
+
+            if (!$jobId || !($job = JobModel::getJobById($jobId))) {
+                throw new APIException('nepostojeci jobId', 400);
+            }
+
+            if (!$data) {
+                throw new APIException('morate odabrati neka polja za update', 400);
+            }
+
+            $data = $this->prepDataForUpdate($data, $job);
+            $updatedJob = JobModel::updateJob($jobId, $data);
+
+            if ($updatedJob) {
+
+            }
+        }
+        catch (APIException $e) {
+            ErrorController::handleAPIError($res, $e, $e->statusCode);
+        }
+        catch (\Throwable $t) {
+            return ErrorController::handleAPIError($res, $t);
         }
     }
 }

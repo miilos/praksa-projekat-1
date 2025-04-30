@@ -44,8 +44,8 @@ class FavouritesModel
         $qb = new QueryBuilder();
         $qb->select('*');
         $qb->table('favourites');
-        $qb->join('INNER JOIN', 'jobs', 'jobId', 'jobId');
-        $qb->join('INNER JOIN', 'employers', 'employerId', 'employerId');
+        $qb->join('INNER JOIN', 'jobs', 'f.jobId', 'j.jobId');
+        $qb->join('INNER JOIN', 'employers', 'j.employerId', 'e.employerId');
         $qb->where(['userId' => $userId]);
         return $qb->execute();
     }

@@ -57,16 +57,13 @@ class QueryBuilder
         $previousJoinTableQualifier = '';
 
         if ($this->join) {
-            $lastQualifierIndex = (strrpos($this->join, '.')) - 1;
-            $previousJoinTableQualifier = $this->join[$lastQualifierIndex];
-
             // if a join already exists, $baseTableField refers to the field from the last table joined
             $this->join .= " $joinType $joinTable $joinTableQualifier
-                           ON $previousJoinTableQualifier.$baseTableField $operation $joinTableQualifier.$joinTableField";
+                           ON $baseTableField $operation $joinTableField";
         }
         else {
             $this->join .= " $baseTableQualifier $joinType $joinTable $joinTableQualifier 
-                           ON $baseTableQualifier.$baseTableField $operation $joinTableQualifier.$joinTableField";
+                           ON $baseTableField $operation $joinTableField";
         }
     }
 
